@@ -4,7 +4,6 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
 import tempfile
-import os
 from datetime import datetime
 
 # -----------------------
@@ -58,26 +57,77 @@ with col2:
     )
 
 # -----------------------
-# QUESTIONS SELON ACTIVITÉ
+# QUESTIONS + SUGGESTIONS MULTILINGUES
 # -----------------------
-st.markdown("### 📝 Répondez aux questions")
-
-questions = {
-    "📚 Histoire": ["Héros/héroïne ?", "Lieu ?", "Objectif ?", "Obstacle ?", "Allié ?"],
-    "🎭 Saynette": ["Personnages ?", "Lieu ?", "Conflit ?", "Accessoire ?", "Moment fort ?"],
-    "✒️ Poème": ["Sujet ?", "Émotion ?", "Forme ?", "Strophe ?", "Dernier vers ?"],
-    "🎵 Chanson": ["Thème ?", "Émotion ?", "Style ?", "Refrain ?", "Tempo ?"],
-    "✨ Libre": ["Idée libre ?", "Lieu ?", "Objet ?", "Allié ?", "Obstacle ?"]
+QPACK = {
+    "FR": {
+        "📚 Histoire": [
+            {"q": "Héros/héroïne ?", "sug": ["Fillette curieuse", "Garçon inventeur", "Chat qui parle"]},
+            {"q": "Lieu ?", "sug": ["Cour d’école", "Forêt magique", "Bus scolaire"]},
+            {"q": "Objectif ?", "sug": ["Retrouver un trésor", "Aider un ami", "Gagner un concours"]},
+            {"q": "Obstacle ?", "sug": ["Orage", "Rival jaloux", "Labyrinthe"]},
+            {"q": "Allié ?", "sug": ["Meilleure amie", "Professeur", "Écureuil"]},
+        ],
+        "🎭 Saynette": [
+            {"q": "Personnages ?", "sug": ["Deux amis", "Prof et élève", "Frères"]},
+            {"q": "Lieu ?", "sug": ["Cantine", "Bus", "Gymnase"]},
+            {"q": "Conflit ?", "sug": ["Quiproquo", "Objet perdu", "Concours raté"]},
+            {"q": "Accessoire ?", "sug": ["Sac", "Affiche", "Téléphone"]},
+            {"q": "Moment fort ?", "sug": ["Réplique culte", "Chute", "Impro"]},
+        ],
+        "✒️ Poème": [
+            {"q": "Sujet ?", "sug": ["Pluie", "Montagne", "Amitié"]},
+            {"q": "Émotion ?", "sug": ["Doux", "Drôle", "Mystérieux"]},
+            {"q": "Forme ?", "sug": ["Alexandrin", "Rimes croisées", "Haïku", "Libre"]},
+            {"q": "Strophe ?", "sug": ["Courte", "Moyenne", "Longue"]},
+            {"q": "Dernier vers ?", "sug": ["Espoir", "Sourire", "Secret"]},
+        ],
+        "🎵 Chanson": [
+            {"q": "Thème ?", "sug": ["Voyage", "École", "Amitié"]},
+            {"q": "Émotion ?", "sug": ["Joie", "Nostalgie", "Courage"]},
+            {"q": "Style ?", "sug": ["Rap", "Pop", "Jazz", "Folk"]},
+            {"q": "Refrain ?", "sug": ["Mot répété", "Onomatopées", "Question/réponse"]},
+            {"q": "Tempo ?", "sug": ["Lent", "Moyen", "Rapide"]},
+        ],
+        "✨ Libre": [
+            {"q": "Idée libre ?", "sug": ["Dragon végétarien", "Ville sous l’eau", "Robot timide"]},
+            {"q": "Lieu ?", "sug": ["Toit", "Forêt", "Plage"]},
+            {"q": "Objet ?", "sug": ["Carnet", "Boussole", "Graine d’étoile"]},
+            {"q": "Allié ?", "sug": ["Voisin", "Chat", "Caméraman"]},
+            {"q": "Obstacle ?", "sug": ["Panne", "Temps limité", "Promesse"]},
+        ],
+    },
+    "EN": {
+        "📚 Histoire": [
+            {"q": "Hero / Heroine?", "sug": ["Curious girl", "Inventor boy", "Talking cat"]},
+            {"q": "Place?", "sug": ["Schoolyard", "Magic forest", "School bus"]},
+            {"q": "Goal?", "sug": ["Find a treasure", "Help a friend", "Win a contest"]},
+            {"q": "Obstacle?", "sug": ["Storm", "Jealous rival", "Maze"]},
+            {"q": "Ally?", "sug": ["Best friend", "Teacher", "Squirrel"]},
+        ],
+        # ... même structure pour Saynette/Poem/Song/Free (traduit en anglais)
+    },
+    # Idem pour ES, DE, IT (tu peux remplir avec les packs traduits comme dans ton JS d’avant)
 }
 
+# -----------------------
+# AFFICHAGE QUESTIONS
+# -----------------------
+st.markdown("### 📝 Répondez aux questions")
 answers = []
+questions = QPACK.get(lang, QPACK["FR"]).get(activity, [])
 progress = st.progress(0)
-total_q = len(questions[activity])
 
-for i, q in enumerate(questions[activity], start=1):
-    val = st.text_input(f"**{i}. {q}**")
+for i, q in enumerate(questions, start=1):
+    colA, colB = st.columns([3, 2])
+    with colA:
+        val = st.text_input(f"**{i}. {q['q']}**", key=f"q{i}")
+    with colB:
+        suggestion = st.selectbox("Suggestions", [""] + q["sug"], key=f"sug{i}")
+        if suggestion:
+            val = suggestion
     answers.append(val)
-    progress.progress(int(i / total_q * 100))
+    progress.progress(int(i / len(questions) * 100))
 
 # -----------------------
 # GÉNÉRATION DU TEXTE
@@ -87,9 +137,8 @@ if st.button("🪄 Générer le texte", use_container_width=True, type="primary"
         st.error("⚠️ Veuillez répondre à au moins une question.")
     else:
         with st.spinner("✍️ L'IA écrit votre création..."):
-            # Construire le prompt
             prompt = f"Langue : {lang}. Activité : {activity}. "
-            prompt += "Crée un texte pour des enfants de 6 à 14 ans. Style positif, adapté et créatif.\n"
+            prompt += "Crée un texte adapté aux enfants (6–14 ans). Style positif et créatif.\n"
             for i, a in enumerate(answers, 1):
                 if a:
                     prompt += f"Q{i}: {a}\n"
@@ -97,7 +146,7 @@ if st.button("🪄 Générer le texte", use_container_width=True, type="primary"
             response = client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[
-                    {"role": "system", "content": "Tu es un assistant créatif pour les enfants."},
+                    {"role": "system", "content": "Tu es un assistant créatif pour enfants."},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.9,
@@ -106,7 +155,6 @@ if st.button("🪄 Générer le texte", use_container_width=True, type="primary"
 
             story = response.choices[0].message.content.strip()
 
-        # AFFICHAGE
         st.success("✨ Voici votre création :")
         st.markdown(f"<div style='background:#f9f9f9; padding:15px; border-radius:10px;'>{story}</div>", unsafe_allow_html=True)
 
@@ -117,7 +165,6 @@ if st.button("🪄 Générer le texte", use_container_width=True, type="primary"
             tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
             c = canvas.Canvas(tmp_file.name, pagesize=A4)
             width, height = A4
-
             # Couverture
             c.setFont("Helvetica-Bold", 22)
             c.drawCentredString(width/2, height - 4*cm, "Atelier Créatif — EDU")
@@ -126,8 +173,7 @@ if st.button("🪄 Générer le texte", use_container_width=True, type="primary"
             c.setFont("Helvetica-Oblique", 10)
             c.drawCentredString(width/2, height - 6*cm, datetime.now().strftime("%d/%m/%Y"))
             c.showPage()
-
-            # Texte principal
+            # Texte
             c.setFont("Helvetica", 12)
             y = height - 3*cm
             for line in text.split("\n"):
