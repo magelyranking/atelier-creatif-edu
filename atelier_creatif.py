@@ -31,13 +31,17 @@ st.info("💡 Votre clé OpenAI reste privée et n’est jamais partagée.")
 # -----------------------
 # CLÉ OPENAI
 # -----------------------
-api_key = st.text_input("🔑 Entrez votre clé OpenAI", type="password")
+import os
+
+# Récupère la clé OpenAI depuis les "secrets" de Streamlit Cloud
+api_key = os.environ.get("OPENAI_API_KEY")
 
 if not api_key:
-    st.warning("Veuillez entrer votre clé OpenAI pour continuer.")
+    st.error("⚠️ Aucune clé API trouvée. Configurez OPENAI_API_KEY dans les secrets Streamlit Cloud.")
     st.stop()
 
 client = OpenAI(api_key=api_key)
+
 
 # -----------------------
 # LANGUE & ACTIVITÉ
