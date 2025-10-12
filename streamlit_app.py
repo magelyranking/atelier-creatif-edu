@@ -51,11 +51,13 @@ import time
 # CARROUSEL AVEC BOUTONS
 # -----------------------
 st.markdown("## 🎬 Inspirations")
-
 images = [
-    {"file": "slide1.jpg", "caption": "✨ Crée une histoire magique avec tes élèves"},
-    {"file": "slide2.jpg", "caption": "🎭 Joue une saynette pleine d’émotion"},
-    {"file": "slide4.jpg", "caption": "🎵 Compose une chanson collaborative"},
+    {"file": "https://raw.githubusercontent.com/magelyranking/atelier-creatif-edu/main/slide1.jpg",
+     "caption": "✨ Crée une histoire magique avec tes élèves"},
+    {"file": "https://raw.githubusercontent.com/magelyranking/atelier-creatif-edu/main/slide2.jpg",
+     "caption": "🎭 Joue une saynette pleine d’émotion"},
+    {"file": "https://raw.githubusercontent.com/magelyranking/atelier-creatif-edu/main/slide4.jpg",
+     "caption": "🎵 Compose une chanson collaborative"},
 ]
 
 # Initialisation
@@ -100,6 +102,46 @@ with col1:
 with col3:
     if st.button("➡️"):
         st.session_state.carousel_index = (st.session_state.carousel_index + 1) % len(images)
+
+# -----------------------
+# LANGUE & ACTIVITÉ
+# -----------------------
+st.markdown("### 🌍 Choisissez la langue et l’activité")
+
+# Sélection de la langue avec drapeaux
+lang_col1, lang_col2, lang_col3, lang_col4, lang_col5 = st.columns(5)
+if lang_col1.button("🇫🇷 FR"):
+    lang = "FR"
+if lang_col2.button("🇬🇧 EN"):
+    lang = "EN"
+if lang_col3.button("🇪🇸 ES"):
+    lang = "ES"
+if lang_col4.button("🇩🇪 DE"):
+    lang = "DE"
+if lang_col5.button("🇮🇹 IT"):
+    lang = "IT"
+
+# Valeur par défaut
+if "lang" not in locals():
+    lang = "FR"
+
+# Sélection activité avec icônes
+act_col1, act_col2, act_col3, act_col4, act_col5 = st.columns(5)
+if act_col1.button("📚 Histoire"):
+    activity = "📚 Histoire"
+if act_col2.button("🎭 Saynette"):
+    activity = "🎭 Saynette"
+if act_col3.button("✒️ Poème"):
+    activity = "✒️ Poème"
+if act_col4.button("🎵 Chanson"):
+    activity = "🎵 Chanson"
+if act_col5.button("✨ Libre"):
+    activity = "✨ Libre"
+
+# Valeur par défaut
+if "activity" not in locals():
+    activity = "📚 Histoire"
+
 # -----------------------
 # QUESTIONS + SUGGESTIONS MULTILINGUES
 # -----------------------
