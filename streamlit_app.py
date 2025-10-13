@@ -430,9 +430,10 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
 )
 
 # 👇 corriger la lecture
+# Récupération du texte de l’IA
 try:
     story = resp.choices[0].message.content.strip()
-except:
+except Exception:
     story = resp.choices[0].message["content"].strip()
 
                     st.success(LABELS[lang]["result_title"])
