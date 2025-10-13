@@ -45,24 +45,25 @@ st.markdown(
     }
 
     /* Suggestions en chips flexibles */
-    .suggestion-wrap {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 8px;
-        margin-bottom: 8px;
-    }
-    .suggestion-btn {
-        flex: none;
-        padding: 6px 14px;
-        border-radius: 20px;
-        background: #e6f7ff;
-        border: 1px solid #91d5ff;
-        cursor: pointer;
-        font-size: 14px;
-        line-height: 1.3em;
-    }
-    .suggestion-btn:hover { background: #bae7ff; }
+.suggestion-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 6px 0;
+}
+.suggestion-btn {
+    flex: none;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: #e6f7ff;
+    border: 1px solid #91d5ff;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1.3em;
+}
+.suggestion-btn:hover {
+    background: #bae7ff;
+}
 
     /* Inputs plus grands (mobile friendly) */
     input, textarea {
@@ -380,9 +381,8 @@ QPACK = {
         ],
     },
 }
-
 # =========================
-# AFFICHAGE QUESTIONS (version compacte)
+# AFFICHAGE QUESTIONS (chips HTML)
 # =========================
 st.markdown(f"### {LABELS[lang]['answer']}")
 st.caption(LABELS[lang]["hint"])
@@ -392,9 +392,8 @@ questions = QPACK.get(lang, QPACK["FR"]).get(activity, [])
 progress = st.progress(0)
 
 for i, q in enumerate(questions, start=1):
-    # Question (carte compacte)
     st.markdown(
-        f"<div class='question-card' style='padding:6px 10px; font-size:15px;'><b>{i}. {q['q']}</b></div>",
+        f"<div class='question-card'><b>{i}. {q['q']}</b></div>",
         unsafe_allow_html=True
     )
 
@@ -402,20 +401,28 @@ for i, q in enumerate(questions, start=1):
     if key_text not in st.session_state:
         st.session_state[key_text] = ""
 
-    # Suggestions en “chips” flexibles sur une seule ligne
-    st.markdown("<div class='suggestion-wrap'>", unsafe_allow_html=True)
+    # Suggestions sous forme de chips
+    sug_html = "<div class='suggestion-wrap'>"
     for j, sug in enumerate(q["sug"]):
-        if st.button(sug, key=f"btn_{i}_{j}"):
-            st.session_state[key_text] = sug
-            st.rerun()
-    st.markdown("</div>", unsafe_allow_html=True)
+        sug_html += f"""
+        <button type="button" class="suggestion-btn"
+            onclick="window.parent.postMessage({{
+                type: 'streamlit:setComponentValue',
+                key: '{key_text}',
+                value: '{sug}'
+            }}, '*')">
+            {sug}
+        </button>
+        """
+    sug_html += "</div>"
+    st.markdown(sug_html, unsafe_allow_html=True)
 
-    # Champ réponse compact (text_input au lieu de text_area)
+    # Champ de saisie compact pour voir/modifier la valeur
     val = st.text_input(" ", key=key_text, label_visibility="collapsed")
     answers.append(val)
 
-    # Progression
     progress.progress(int(i / max(1, len(questions)) * 100))
+
 
 
 # Petit indicateur d’essais restants
