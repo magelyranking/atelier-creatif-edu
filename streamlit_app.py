@@ -1,5 +1,5 @@
 import streamlit as st
-from openai import OpenAI
+import openai
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
@@ -20,9 +20,7 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    body {
-        background: #f0f8ff;
-    }
+    body { background: #f0f8ff; }
     .stButton>button {
         border-radius: 10px;
         padding: 0.5em 1em;
@@ -45,9 +43,7 @@ st.markdown(
         border: 1px solid #91d5ff;
         cursor: pointer;
     }
-    .suggestion-btn:hover {
-        background: #bae7ff;
-    }
+    .suggestion-btn:hover { background: #bae7ff; }
     </style>
     """,
     unsafe_allow_html=True
@@ -60,27 +56,26 @@ st.markdown("<h1 style='text-align: center; color: #ff69b4;'>🎨 Atelier Créat
 st.markdown(
     """
     <p style="text-align: center; font-size:16px;">
-    Créez facilement des <b>histoires, poèmes, chansons ou saynettes</b> pour vos élèves (6–14 ans).  
+    Créez facilement des <b>histoires, poèmes, chansons ou saynettes</b> pour vos élèves (6–14 ans).<br>
     Répondez aux questions ➝ téléchargez en <b>PDF</b> ✨
     </p>
     """,
     unsafe_allow_html=True
 )
 
-st.info("💡 Votre clé OpenAI est sécurisée via Streamlit Cloud (secrets).")
+st.info("💡 Votre clé OpenAI est sécurisée via Streamlit Cloud (Secrets).")
 
 # -----------------------
 # CLÉ OPENAI
 # -----------------------
 api_key = os.environ.get("OPENAI_API_KEY")
 if not api_key:
-    st.error("⚠️ Aucune clé API trouvée. Configurez OPENAI_API_KEY dans les secrets Streamlit Cloud.")
+    st.error("⚠️ Aucune clé API trouvée. Ajoutez OPENAI_API_KEY dans les Secrets Streamlit Cloud.")
     st.stop()
-
-client = OpenAI(api_key=api_key)
+openai.api_key = api_key
 
 # -----------------------
-# CARROUSEL IMAGES
+# CARROUSEL IMAGES (avec SLIDER)
 # -----------------------
 st.markdown("## 🎬 Inspirations")
 
@@ -90,26 +85,46 @@ images = [
     {"file": "slide4.jpg", "caption": "🎵 Compose une chanson collaborative"},
 ]
 
+# État initial
 if "carousel_index" not in st.session_state:
     st.session_state.carousel_index = 0
 
-img = images[st.session_state.carousel_index]
-st.image(img["file"], use_column_width=True, caption=img["caption"])
+total_imgs = len(images)
 
-col1, col2, col3 = st.columns([1,6,1])
-with col1:
+# Slider (1..N) synchronisé avec l'état
+slider_val = st.slider(
+    "Sélectionne une image",
+    min_value=1, max_value=total_imgs,
+    value=st.session_state.carousel_index + 1,
+    key="carousel_slider"
+)
+st.session_state.carousel_index = slider_val - 1
+
+# Affichage image
+current = images[st.session_state.carousel_index]
+if os.path.exists(current["file"]):
+    st.image(current["file"], use_column_width=True, caption=current["caption"])
+else:
+    st.warning(f"Image introuvable : {current['file']} (ajoute-la dans le repo)")
+    st.markdown(f"**{current['caption']}**")
+
+# Boutons ← →
+c1, c2, c3 = st.columns([1,6,1])
+with c1:
     if st.button("⬅️"):
-        st.session_state.carousel_index = (st.session_state.carousel_index - 1) % len(images)
-with col3:
+        st.session_state.carousel_index = (st.session_state.carousel_index - 1) % total_imgs
+        st.session_state.carousel_slider = st.session_state.carousel_index + 1
+with c3:
     if st.button("➡️"):
-        st.session_state.carousel_index = (st.session_state.carousel_index + 1) % len(images)
+        st.session_state.carousel_index = (st.session_state.carousel_index + 1) % total_imgs
+        st.session_state.carousel_slider = st.session_state.carousel_index + 1
 
 # -----------------------
 # LANGUE & ACTIVITÉ
 # -----------------------
 st.markdown("### 🌍 Choisissez la langue et l’activité")
 
-lang_buttons = {"🇫🇷 FR": "FR", "🇬🇧 EN": "EN", "🇪🇸 ES": "ES", "🇩🇪 DE": "DE", "🇮🇹 IT": "IT"}
+lang_buttons = {"🇫🇷 FR": "FR", "🇬🇧 EN": "EN"}
 cols = st.columns(len(lang_buttons))
 for i, (label, code) in enumerate(lang_buttons.items()):
     if cols[i].button(label):
@@ -119,7 +134,7 @@ if "lang" not in st.session_state:
     st.session_state.lang = "FR"
 lang = st.session_state.lang
 
-act_buttons = {"📚 Histoire": "Histoire", "🎭 Saynette": "Saynette", "✒️ Poème": "Poème", "🎵 Chanson": "Chanson", "✨ Libre": "Libre"}
+act_buttons = {"📚 Histoire": "Histoire", "🎭 Saynette": "Saynette"}
 cols = st.columns(len(act_buttons))
 for i, (label, code) in enumerate(act_buttons.items()):
     if cols[i].button(label):
@@ -128,6 +143,12 @@ for i, (label, code) in enumerate(act_buttons.items()):
 if "activity" not in st.session_state:
     st.session_state.activity = "Histoire"
 activity = st.session_state.activity
+
+# -----------------------
+# CHAMP AUTEUR
+# -----------------------
+st.markdown("### ✍️ Auteur")
+author = st.text_input("Nom de l’auteur :", "Ma classe")
 
 # -----------------------
 # QUESTIONS + SUGGESTIONS
@@ -146,28 +167,38 @@ QPACK = {
             {"q": "Lieu ?", "sug": ["Cantine", "Bus", "Gymnase"]},
             {"q": "Conflit ?", "sug": ["Quiproquo", "Objet perdu", "Concours raté"]},
         ],
-        # Ajoute Poème / Chanson / Libre comme avant...
     },
-    # EN, ES, DE, IT -> traductions à compléter
+    "EN": {
+        "Histoire": [  # simple fallback in EN
+            {"q": "Hero/heroine?", "sug": ["Curious girl", "Inventor boy", "Talking cat"]},
+            {"q": "Setting?", "sug": ["Schoolyard", "Magic forest", "School bus"]},
+        ],
+        "Saynette": [
+            {"q": "Characters?", "sug": ["Two friends", "Teacher & student", "Siblings"]},
+            {"q": "Place?", "sug": ["Cafeteria", "Bus", "Gym"]},
+            {"q": "Conflict?", "sug": ["Misunderstanding", "Lost item", "Failed contest"]},
+        ],
+    },
 }
 
 st.markdown("### 📝 Répondez aux questions")
-
 answers = []
 questions = QPACK.get(lang, QPACK["FR"]).get(activity, [])
-progress = st.progress(0)
 
+progress = st.progress(0)
 for i, q in enumerate(questions, start=1):
     with st.container():
         st.markdown(f"<div class='card'><b>{i}. {q['q']}</b></div>", unsafe_allow_html=True)
+        # garantir une clé d'état
+        st.session_state.setdefault(f"q{i}", "")
         val = st.text_input("", key=f"q{i}")
         sug_cols = st.columns(len(q["sug"]))
         for j, sug in enumerate(q["sug"]):
             if sug_cols[j].button(sug, key=f"sug{i}_{j}"):
-                val = sug
                 st.session_state[f"q{i}"] = sug
+                val = sug
         answers.append(val)
-    progress.progress(int(i / len(questions) * 100))
+    progress.progress(int(i / max(1, len(questions)) * 100))
 
 # -----------------------
 # GÉNÉRATION DU TEXTE
@@ -179,60 +210,4 @@ if st.button("🪄 Générer le texte", use_container_width=True, type="primary"
         with st.spinner("✍️ L'IA écrit votre création..."):
             prompt = f"Langue : {lang}. Activité : {activity}. "
             prompt += "Crée un texte adapté aux enfants (6–14 ans). Style positif et créatif.\n"
-            for i, a in enumerate(answers, 1):
-                if a:
-                    prompt += f"Q{i}: {a}\n"
-
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {"role": "system", "content": "Tu es un assistant créatif pour enfants."},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.9,
-                max_tokens=700
-            )
-
-            story = response.choices[0].message.content.strip()
-
-        st.success("✨ Voici votre création :")
-        st.markdown(f"<div style='background:#fff0f6; padding:15px; border-radius:10px;'>{story}</div>", unsafe_allow_html=True)
-
-        # -----------------------
-        # EXPORT EN PDF
-        # -----------------------
-        def create_pdf(text):
-            tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
-            c = canvas.Canvas(tmp_file.name, pagesize=A4)
-            width, height = A4
-            # Couverture
-            c.setFont("Helvetica-Bold", 22)
-            c.drawCentredString(width/2, height - 4*cm, "Atelier Créatif — EDU")
-            c.setFont("Helvetica", 14)
-            c.drawCentredString(width/2, height - 5*cm, activity)
-            c.setFont("Helvetica-Oblique", 10)
-            c.drawCentredString(width/2, height - 6*cm, datetime.now().strftime("%d/%m/%Y"))
-            c.showPage()
-            # Texte
-            c.setFont("Helvetica", 12)
-            y = height - 3*cm
-            for line in text.split("\n"):
-                for subline in [line[i:i+90] for i in range(0, len(line), 90)]:
-                    c.drawString(2*cm, y, subline)
-                    y -= 15
-                    if y < 2*cm:
-                        c.showPage()
-                        c.setFont("Helvetica", 12)
-                        y = height - 3*cm
-            c.save()
-            return tmp_file.name
-
-        pdf_path = create_pdf(story)
-        with open(pdf_path, "rb") as f:
-            st.download_button(
-                label="⬇️ Télécharger en PDF",
-                data=f,
-                file_name="atelier_creatif.pdf",
-                mime="application/pdf",
-                use_container_width=True
-            )
+            prompt += f"Auteur : {author}\n"
