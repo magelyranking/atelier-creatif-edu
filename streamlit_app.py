@@ -187,6 +187,42 @@ div[role="radiogroup"] label span {
 div[role="radiogroup"] > label[data-checked="true"] span {
     color: #ffffff !important;
 }
+/* Désactiver le mode sombre forcé de Safari iOS */
+html, body {
+    color-scheme: only light !important;
+    -webkit-appearance: none !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+/* Suggestions (chips) */
+.suggestion-btn {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #91d5ff !important;
+}
+
+/* Radios (langue + activité) */
+div[role="radiogroup"] > label {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #91d5ff !important;
+}
+div[role="radiogroup"] > label[data-checked="true"] {
+    background: #1890ff !important;
+    color: #ffffff !important;
+}
+
+/* Forcer le texte dans les radios visibles */
+div[role="radiogroup"] label span {
+    display: inline !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: #000000 !important;
+}
+div[role="radiogroup"] > label[data-checked="true"] span {
+    color: #ffffff !important;
+}
 
     </style>
     """,
