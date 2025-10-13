@@ -441,7 +441,7 @@ QPACK = {
     },
 }
 # =========================
-# AFFICHAGE QUESTIONS (version radio horizontal)
+# AFFICHAGE QUESTIONS (corrigé, compact, lisible)
 # =========================
 st.markdown(f"### {LABELS[lang]['answer']}")
 st.caption(LABELS[lang]["hint"])
@@ -451,24 +451,26 @@ questions = QPACK.get(lang, QPACK["FR"]).get(activity, [])
 progress = st.progress(0)
 
 for i, q in enumerate(questions, start=1):
-st.markdown(
-    f"<div class='question-card'><b>{i}. {q['q']}</b></div>",
-    unsafe_allow_html=True
-)
+    # Question
+    st.markdown(
+        f"<div class='question-card'><b>{i}. {q['q']}</b></div>",
+        unsafe_allow_html=True
+    )
 
-    # Clé unique pour chaque question
+    # Clé unique
     key_text = f"answer_{activity}_{lang}_{i}"
 
-    # Suggestions en ligne
+    # Suggestions en boutons côte à côte
     cols = st.columns(len(q["sug"]))
     for j, sug in enumerate(q["sug"]):
         if cols[j].button(sug, key=f"btn_{activity}_{lang}_{i}_{j}"):
             st.session_state[key_text] = sug
 
-    # Champ de texte lié à cette question
+    # Champ texte lié à la question
     val = st.text_input(" ", key=key_text, label_visibility="collapsed")
     answers.append(val)
 
+    # Barre de progression
     progress.progress(int(i / max(1, len(questions)) * 100))
 
 
