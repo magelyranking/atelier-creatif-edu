@@ -591,15 +591,12 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
                     )
                     story = resp.choices[0].message.content.strip()
 
-                    # Affichage résultat
-# Affichage résultat
-st.success(LABELS[lang]["result_title"])
-st.markdown(
-    f"<div class='result-box'>{story}</div>",
-    unsafe_allow_html=True
-)
-
-
+                    # Affichage résultat (⚠️ bien indenté)
+                    st.success(LABELS[lang]["result_title"])
+                    st.markdown(
+                        f"<div class='result-box'>{story}</div>",
+                        unsafe_allow_html=True
+                    )
 
                     # Export PDF
                     def create_pdf(text: str) -> str:
@@ -620,7 +617,6 @@ st.markdown(
                         c.setFont("Helvetica", 12)
                         y = height - 3*cm
                         for line in text.split("\n"):
-                            # wrap manuel
                             parts = [line[i:i+90] for i in range(0, len(line), 90)] if line else [""]
                             for sub in parts:
                                 c.drawString(2*cm, y, sub)
@@ -644,4 +640,5 @@ st.markdown(
 
                 except Exception as e:
                     st.error(f"❌ Erreur OpenAI : {e}")
+
 
