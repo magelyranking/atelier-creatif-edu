@@ -419,16 +419,21 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
                         prompt += f"Q{i}: {a}\n"
 
                 try:
-                    resp = client.chat.completions.create(
-                        model="gpt-4o-mini",
-                        messages=[
-                            {"role": "system", "content": "Tu es un assistant créatif pour enfants."},
-                            {"role": "user", "content": prompt},
-                        ],
-                        temperature=0.9,
-                        max_tokens=500,
-                    )
-                    story = resp.choices[0].message.content.strip()
+                   resp = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[
+        {"role": "system", "content": "Tu es un assistant créatif pour enfants."},
+        {"role": "user", "content": prompt},
+    ],
+    temperature=0.9,
+    max_tokens=500,
+)
+
+# 👇 corriger la lecture
+try:
+    story = resp.choices[0].message.content.strip()
+except:
+    story = resp.choices[0].message["content"].strip()
 
                     st.success(LABELS[lang]["result_title"])
                     st.markdown(
