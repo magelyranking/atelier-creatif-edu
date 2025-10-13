@@ -416,7 +416,6 @@ for i, q in enumerate(questions, start=1):
                 val = sug
 
         # Synchronisation en dehors du handler de bouton (évite StreamlitAPIException)
-        st.session_state[f"q{i}"] = val
         answers.append(val)
 
     progress.progress(int(i / max(1, len(questions)) * 100))
