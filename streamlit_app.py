@@ -138,6 +138,12 @@ input[type="text"] {
     background-color: #ffffff !important;
     font-size: 15px !important;
 }
+/* Corrige l'affichage du placeholder sur iPhone/iPad */
+input::placeholder {
+    color: #666 !important;   /* gris bien visible */
+    opacity: 1 !important;    /* force l'affichage (Safari met parfois à 0.4) */
+    font-size: 14px !important;
+}
   
     </style>
     """,
