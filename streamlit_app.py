@@ -380,8 +380,9 @@ QPACK = {
         ],
     },
 }
+
 # =========================
-# AFFICHAGE QUESTIONS (UI améliorée)
+# AFFICHAGE QUESTIONS (version compacte)
 # =========================
 st.markdown(f"### {LABELS[lang]['answer']}")
 st.caption(LABELS[lang]["hint"])
@@ -391,13 +392,17 @@ questions = QPACK.get(lang, QPACK["FR"]).get(activity, [])
 progress = st.progress(0)
 
 for i, q in enumerate(questions, start=1):
-    st.markdown(f"<div class='question-card'><b>{i}. {q['q']}</b></div>", unsafe_allow_html=True)
+    # Question (carte compacte)
+    st.markdown(
+        f"<div class='question-card' style='padding:6px 10px; font-size:15px;'><b>{i}. {q['q']}</b></div>",
+        unsafe_allow_html=True
+    )
 
     key_text = f"text_{i}"
     if key_text not in st.session_state:
         st.session_state[key_text] = ""
 
-    # Suggestions en chips flexibles (wrap)
+    # Suggestions en “chips” flexibles sur une seule ligne
     st.markdown("<div class='suggestion-wrap'>", unsafe_allow_html=True)
     for j, sug in enumerate(q["sug"]):
         if st.button(sug, key=f"btn_{i}_{j}"):
@@ -405,11 +410,13 @@ for i, q in enumerate(questions, start=1):
             st.rerun()
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Zone de saisie confortable (évite le débordement sur iPhone)
-    val = st.text_area("", key=key_text, height=48)
+    # Champ réponse compact (text_input au lieu de text_area)
+    val = st.text_input(" ", key=key_text, label_visibility="collapsed")
     answers.append(val)
 
+    # Progression
     progress.progress(int(i / max(1, len(questions)) * 100))
+
 
 # Petit indicateur d’essais restants
 st.caption(LABELS[lang]["tries_left"].format(n=max(0, 5 - st.session_state["essais"])))
