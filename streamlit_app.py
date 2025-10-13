@@ -439,29 +439,24 @@ questions = QPACK.get(lang, QPACK["FR"]).get(activity, [])
 progress = st.progress(0)
 
 for i, q in enumerate(questions, start=1):
-    # Question
     st.markdown(
-        f"<div class='question-card' style='padding:6px 10px; font-size:15px;'><b>{i}. {q['q']}</b></div>",
+        f"<div class='question-card'><b>{i}. {q['q']}</b></div>",
         unsafe_allow_html=True
     )
 
-    key_text = f"text_{i}"
-    if key_text not in st.session_state:
-        st.session_state[key_text] = ""
+    # Clé unique pour chaque question
+    key_text = f"answer_{activity}_{lang}_{i}"
 
-    # Suggestions affichées en ligne
-  # Suggestions sous forme de boutons en ligne (compatible mobile)
-cols = st.columns(len(q["sug"]))
-for j, sug in enumerate(q["sug"]):
-    if cols[j].button(sug, key=f"btn_{i}_{j}"):
-        st.session_state[key_text] = sug
+    # Suggestions en ligne
+    cols = st.columns(len(q["sug"]))
+    for j, sug in enumerate(q["sug"]):
+        if cols[j].button(sug, key=f"btn_{activity}_{lang}_{i}_{j}"):
+            st.session_state[key_text] = sug
 
-
-    # Champ compact pour modifier ou entrer autre chose
+    # Champ de texte lié à cette question
     val = st.text_input(" ", key=key_text, label_visibility="collapsed")
     answers.append(val)
 
-    # Progression
     progress.progress(int(i / max(1, len(questions)) * 100))
 
 
