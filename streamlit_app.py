@@ -16,6 +16,51 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="collapsed"
 )
+# -----------------------
+# TRADUCTIONS UI
+# -----------------------
+LABELS = {
+    "FR": {
+        "author_title": "✍️ Auteur",
+        "author_name": "Nom de l’auteur :",
+        "choose_activity": "🌍 Choisissez la langue et l’activité",
+        "questions": "📝 Répondez aux questions",
+        "hint": "💡 Utilisez les suggestions en cliquant dessus ou ajoutez votre idée.",
+        "generate": "🪄 Générer le texte"
+    },
+    "EN": {
+        "author_title": "✍️ Author",
+        "author_name": "Author’s name:",
+        "choose_activity": "🌍 Choose the language and activity",
+        "questions": "📝 Answer the questions",
+        "hint": "💡 Use the suggestions by clicking them or add your own idea.",
+        "generate": "🪄 Generate text"
+    },
+    "ES": {
+        "author_title": "✍️ Autor",
+        "author_name": "Nombre del autor:",
+        "choose_activity": "🌍 Elige el idioma y la actividad",
+        "questions": "📝 Responde a las preguntas",
+        "hint": "💡 Usa las sugerencias haciendo clic o añade tu propia idea.",
+        "generate": "🪄 Generar el texto"
+    },
+    "DE": {
+        "author_title": "✍️ Autor",
+        "author_name": "Name des Autors:",
+        "choose_activity": "🌍 Wähle die Sprache und die Aktivität",
+        "questions": "📝 Beantworte die Fragen",
+        "hint": "💡 Nutze die Vorschläge oder füge deine eigene Idee hinzu.",
+        "generate": "🪄 Text generieren"
+    },
+    "IT": {
+        "author_title": "✍️ Autore",
+        "author_name": "Nome dell’autore:",
+        "choose_activity": "🌍 Scegli la lingua e l’attività",
+        "questions": "📝 Rispondi alle domande",
+        "hint": "💡 Usa i suggerimenti cliccando o aggiungi la tua idea.",
+        "generate": "🪄 Genera il testo"
+    }
+}
 
 st.markdown(
     """
