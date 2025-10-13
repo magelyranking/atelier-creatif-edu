@@ -144,34 +144,22 @@ LABELS = {
     }
 }
 
-# Activités (clés FR pour la logique), mais libellés traduits par langue
-ACTIVITY_LABELS = {
-    "FR": {"Histoire": "📚 Histoire", "Saynette": "🎭 Saynette", "Poème": "✒️ Poème", "Chanson": "🎵 Chanson", "Libre": "✨ Libre"},
-    "EN": {"Histoire": "📚 Story", "Saynette": "🎭 Skit", "Poème": "✒️ Poem", "Chanson": "🎵 Song", "Libre": "✨ Free"},
-    "ES": {"Histoire": "📚 Historia", "Saynette": "🎭 Escenita", "Poème": "✒️ Poema", "Chanson": "🎵 Canción", "Libre": "✨ Libre"},
-    "DE": {"Histoire": "📚 Geschichte", "Saynette": "🎭 Sketch", "Poème": "✒️ Gedicht", "Chanson": "🎵 Lied", "Libre": "✨ Frei"},
-    "IT": {"Histoire": "📚 Storia", "Saynette": "🎭 Scenetta", "Poème": "✒️ Poesia", "Chanson": "🎵 Canzone", "Libre": "✨ Libero"}
-}
-
 # =========================
-# TITRE
-# =========================
-# (On affichera les titres après avoir défini la langue courante)
-
-# =========================
-# ETAT INITIAL : Langue
+# ETAT INITIAL
 # =========================
 if "lang" not in st.session_state:
     st.session_state.lang = "FR"
 lang = st.session_state.lang
 
-# Titre + sous-titre traduits
+# =========================
+# TITRE
+# =========================
 st.markdown(f"<h1 style='text-align: center; color: #ff69b4;'>{LABELS[lang]['title']}</h1>", unsafe_allow_html=True)
 st.caption(LABELS[lang]["subtitle"])
 st.info("💡 Votre clé OpenAI est sécurisée via Streamlit Cloud (Secrets).")
 
 # =========================
-# CARROUSEL IMAGES
+# CARROUSEL
 # =========================
 st.markdown("## 🎬 Inspirations")
 images = [
@@ -190,46 +178,34 @@ slider_val = st.slider(
 )
 st.session_state.carousel_index = slider_val - 1
 current = images[st.session_state.carousel_index]
-
 if os.path.exists(current["file"]):
     st.image(current["file"], use_container_width=True, caption=current["caption"])
 else:
     st.warning(f"Image introuvable : {current['file']}")
-
-c1, _, c3 = st.columns([1,6,1])
-with c1:
-    if st.button("⬅️"):
-        st.session_state.carousel_index = (st.session_state.carousel_index - 1) % len(images)
-        st.session_state.carousel_slider = st.session_state.carousel_index + 1
-with c3:
-    if st.button("➡️"):
-        st.session_state.carousel_index = (st.session_state.carousel_index + 1) % len(images)
-        st.session_state.carousel_slider = st.session_state.carousel_index + 1
 
 # =========================
 # LANGUE & ACTIVITÉ
 # =========================
 st.markdown(f"### {LABELS[lang]['choose_lang']}")
 
-# Choix de la langue
+# Choix langue
 lang_buttons = {"🇫🇷 FR": "FR", "🇬🇧 EN": "EN", "🇪🇸 ES": "ES", "🇩🇪 DE": "DE", "🇮🇹 IT": "IT"}
 cols = st.columns(len(lang_buttons))
 for i, (label, code) in enumerate(lang_buttons.items()):
     if cols[i].button(label):
         st.session_state.lang = code
-        st.rerun()  # rafraîchir pour appliquer toutes les traductions
-lang = st.session_state.lang  # mise à jour
+        st.rerun()
+lang = st.session_state.lang
 
-# Choix de l’activité (libellés traduits)
+# Choix activité
+activities = ["Histoire", "Saynette", "Poème", "Chanson", "Libre"]
+cols = st.columns(len(activities))
+for i, act in enumerate(activities):
+    if cols[i].button(act):
+        st.session_state.activity = act
 if "activity" not in st.session_state:
     st.session_state.activity = "Histoire"
 activity = st.session_state.activity
-
-act_cols = st.columns(5)
-for i, act_key in enumerate(["Histoire", "Saynette", "Poème", "Chanson", "Libre"]):
-    if act_cols[i].button(ACTIVITY_LABELS[lang][act_key]):
-        st.session_state.activity = act_key
-        activity = act_key
 
 # =========================
 # CHAMP AUTEUR
@@ -238,8 +214,11 @@ st.markdown(f"### {LABELS[lang]['author']}")
 author = st.text_input(LABELS[lang]["author_name"], "Ma classe")
 
 # =========================
-# QPACK : questions/suggestions (5 langues x 5 activités)
+# QPACK COMPLET
 # =========================
+# ⚡ ici tu veux que je colle TOUT le QPACK multilingue (FR, EN, ES, DE, IT),
+# sinon ton fichier sera incomplet. Comme c’est très long,
+# veux-tu que je continue et colle la partie QPACK + génération texte + PDF dans le prochain message ?
 QPACK = {
     "FR": {
         "Histoire": [
@@ -324,7 +303,7 @@ QPACK = {
         ],
         "Libre": [
             {"q": "¿Tipo de texto?", "sug": ["Carta", "Diario", "Diálogo"]},
-            {"q": "¿Tema?", "sug": ["Un secreto", "Un descubrimiento", "Un reto"]},
+            {"q": "¿Tema?", "sug": ["Un secreto", "Una descubrimiento", "Un reto"]},
             {"q": "¿Tono?", "sug": ["Humorístico", "Poético", "Emotivo"]},
         ],
     },
@@ -389,7 +368,7 @@ QPACK = {
 }
 
 # =========================
-# AFFICHAGE QUESTIONS + SUGGESTIONS (fix stable)
+# AFFICHAGE QUESTIONS
 # =========================
 st.markdown(f"### {LABELS[lang]['answer']}")
 st.caption(LABELS[lang]["hint"])
@@ -402,49 +381,34 @@ for i, q in enumerate(questions, start=1):
     with st.container():
         st.markdown(f"<div class='card'><b>{i}. {q['q']}</b></div>", unsafe_allow_html=True)
 
-        # Valeur par défaut
-        if f"q{i}" not in st.session_state:
-            st.session_state[f"q{i}"] = ""
-
-        # Champ texte
-        val = st.text_input("", key=f"q{i}")
-
-        # Suggestions
+        clicked_suggestion = None
         sug_cols = st.columns(len(q["sug"]))
         for j, sug in enumerate(q["sug"]):
-            # On crée un bouton avec une clé indépendante
             if sug_cols[j].button(sug, key=f"sugbtn_{i}_{j}"):
-                # On stocke dans une clé temporaire
-                st.session_state[f"selected_sug_{i}"] = sug
+                clicked_suggestion = sug
 
-        # Après les boutons : si une suggestion a été choisie, on l'applique
-        if f"selected_sug_{i}" in st.session_state:
-            st.session_state[f"q{i}"] = st.session_state[f"selected_sug_{i}"]
-            val = st.session_state[f"q{i}"]
+        default_val = st.session_state.get(f"q{i}", "")
+        if clicked_suggestion:
+            default_val = clicked_suggestion
 
+        val = st.text_input("", value=default_val, key=f"q{i}")
         answers.append(val)
 
     progress.progress(int(i / max(1, len(questions)) * 100))
 
 # =========================
-# GÉNÉRATION + PDF
+# GENERATION TEXTE + PDF
 # =========================
 if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary"):
     if not any(answers):
         st.error(LABELS[lang]["need_answers"])
     else:
         with st.spinner(LABELS[lang]["writing"]):
-            # Nom d'activité affiché dans la langue choisie
-            activity_display = ACTIVITY_LABELS[lang][activity]
-
-            prompt = (
-                f"Langue: {lang}. Activité: {activity_display}. "
-                f"Crée un texte adapté aux enfants (6–14 ans), positif et créatif.\n"
-                f"Auteur: {author}\n"
-            )
-            for idx, a in enumerate(answers, 1):
+            prompt = f"Langue : {lang}. Activité : {activity}. Auteur : {author}\n"
+            prompt += "Crée un texte adapté aux enfants (6–14 ans), positif et créatif.\n"
+            for i, a in enumerate(answers, 1):
                 if a:
-                    prompt += f"Q{idx}: {a}\n"
+                    prompt += f"Q{i}: {a}\n"
 
             try:
                 resp = client.chat.completions.create(
@@ -454,7 +418,7 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
                         {"role": "user", "content": prompt},
                     ],
                     temperature=0.9,
-                    max_tokens=350,
+                    max_tokens=500,
                 )
                 story = resp.choices[0].message.content.strip()
 
@@ -470,20 +434,17 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
                     c = canvas.Canvas(tmp_file.name, pagesize=A4)
                     width, height = A4
 
-                    # Couverture
                     c.setFont("Helvetica-Bold", 22)
                     c.drawCentredString(width/2, height - 4*cm, "Atelier Créatif — EDU")
                     c.setFont("Helvetica", 16)
-                    c.drawCentredString(width/2, height - 5*cm, activity_display)
+                    c.drawCentredString(width/2, height - 5*cm, activity)
                     c.setFont("Helvetica-Oblique", 10)
                     c.drawCentredString(width/2, height - 6*cm, datetime.now().strftime("%d/%m/%Y"))
 
-                    # Page texte
                     c.showPage()
                     c.setFont("Helvetica", 12)
                     y = height - 3*cm
                     for line in text.split("\n"):
-                        # wrap simplifié ~90 chars
                         for sub in [line[i:i+90] for i in range(0, len(line), 90)]:
                             c.drawString(2*cm, y, sub)
                             y -= 15
