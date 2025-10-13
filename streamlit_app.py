@@ -417,9 +417,7 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
                 for i, a in enumerate(answers, 1):
                     if a:
                         prompt += f"Q{i}: {a}\n"
-
-                try:
-                 resp = client.chat.completions.create(
+          resp = client.chat.completions.create(
     model="gpt-4o-mini",
     messages=[
         {"role": "system", "content": "Tu es un assistant créatif pour enfants."},
@@ -429,11 +427,12 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
     max_tokens=500,
 )
 
-# 🔎 Récupération du texte de l’IA (bloc complet)
+# ✅ Bloc complet, pas de "try:" tout seul !
 try:
     story = resp.choices[0].message.content.strip()
 except Exception:
     story = resp.choices[0].message["content"].strip()
+
 
                     st.success(LABELS[lang]["result_title"])
                     st.markdown(
