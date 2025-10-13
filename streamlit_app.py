@@ -477,7 +477,9 @@ for i, q in enumerate(questions, start=1):
     " ",
     key=key_text,
     label_visibility="collapsed",
- # Placeholders multilingues
+# =========================
+# Placeholders multilingues
+# =========================
 placeholders = {
     "FR": "Votre idée ou une suggestion…",
     "EN": "Your idea or a suggestion…",
@@ -486,12 +488,18 @@ placeholders = {
     "IT": "La tua idea o un suggerimento…",
 }
 
+# =========================
+# AFFICHAGE QUESTIONS
+# =========================
+st.markdown(f"### {LABELS[lang]['answer']}")
+st.caption(LABELS[lang]["hint"])
+
 answers = []
 questions = QPACK.get(lang, QPACK["FR"]).get(activity, [])
 progress = st.progress(0)
 
 for i, q in enumerate(questions, start=1):
-    # Afficher la question
+    # Question
     st.markdown(
         f"<div class='question-card'><b>{i}. {q['q']}</b></div>",
         unsafe_allow_html=True
@@ -500,7 +508,7 @@ for i, q in enumerate(questions, start=1):
     # Clé unique
     key_text = f"answer_{activity}_{lang}_{i}"
 
-    # Suggestions sous forme de boutons côte à côte
+    # Suggestions sous forme de boutons
     cols = st.columns(len(q["sug"]))
     for j, sug in enumerate(q["sug"]):
         if cols[j].button(sug, key=f"btn_{activity}_{lang}_{i}_{j}"):
