@@ -149,7 +149,21 @@ input::placeholder {
     opacity: 1 !important;    /* force l'affichage (Safari met parfois à 0.4) */
     font-size: 14px !important;
 }
-  
+/* Force un thème clair même si iPhone est en mode sombre */
+html, body, .main, .block-container {
+    background-color: #f9f9f9 !important;
+    color: #000000 !important;
+}
+
+.result-box {
+    background: #fff0f6 !important;
+    color: #000000 !important;
+}
+
+.question-card {
+    background: #ffffff !important;
+    color: #000000 !important;
+}
     </style>
     """,
     unsafe_allow_html=True
@@ -335,8 +349,17 @@ st.session_state.lang = lang
 activity = st.radio(
     "🎭 Activité",
     options=["Histoire", "Saynette", "Poème", "Chanson", "Libre"],
+    format_func=lambda x: {
+        "Histoire": "📖 Histoire",
+        "Saynette": "🎭 Saynette",
+        "Poème": "✒️ Poème",
+        "Chanson": "🎵 Chanson",
+        "Libre": "✨ Libre"
+    }[x],
     horizontal=True,
-    index=["Histoire", "Saynette", "Poème", "Chanson", "Libre"].index(st.session_state.get("activity", "Histoire"))
+    index=["Histoire", "Saynette", "Poème", "Chanson", "Libre"].index(
+        st.session_state.get("activity", "Histoire")
+    )
 )
 st.session_state.activity = activity
 
