@@ -402,21 +402,22 @@ for i, q in enumerate(questions, start=1):
     with st.container():
         st.markdown(f"<div class='card'><b>{i}. {q['q']}</b></div>", unsafe_allow_html=True)
 
-        # Valeur par défaut dans l'état
+        # Valeur par défaut
         if f"q{i}" not in st.session_state:
             st.session_state[f"q{i}"] = ""
 
-        # Champ texte (lié à session_state)
+        # Champ texte
         val = st.text_input("", key=f"q{i}")
 
-        # Suggestions : on modifie 'val' d'abord, puis on synchronise l'état
+        # Boutons de suggestion
         sug_cols = st.columns(len(q["sug"]))
         for j, sug in enumerate(q["sug"]):
             if sug_cols[j].button(sug, key=f"sug{i}_{j}"):
+                # ⚡ mettre à jour directement la valeur dans session_state
+                st.session_state[f"q{i}"] = sug
                 val = sug
 
-        # Synchronisation en dehors du handler de bouton (évite StreamlitAPIException)
-        answers.append(val)
+        answers.append(val)  # la valeur finale est prise du champ ou du bouton
 
     progress.progress(int(i / max(1, len(questions)) * 100))
 
