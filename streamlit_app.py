@@ -396,70 +396,81 @@ for i, q in enumerate(questions, start=1):
 # =========================
 # GENERATION TEXTE + PDF
 # =========================
+# =========================
+# ESSAIS GRATUITS
+# =========================
+if "essais" not in st.session_state:
+    st.session_state["essais"] = 0
+
 if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary"):
     if not any(answers):
         st.error(LABELS[lang]["need_answers"])
     else:
-        with st.spinner(LABELS[lang]["writing"]):
-            prompt = f"Langue : {lang}. Activité : {activity}. Auteur : {author}\n"
-            prompt += "Crée un texte adapté aux enfants (6–14 ans), positif et créatif.\n"
-            for i, a in enumerate(answers, 1):
-                if a:
-                    prompt += f"Q{i}: {a}\n"
+        # Vérifier le quota
+        if st.session_state["essais"] >= 5:
+            st.warning("🚫 Vous avez atteint vos 5 essais gratuits.\n\n👉 Contactez-nous pour continuer ou débloquer un accès complet.")
+        else:
+            st.session_state["essais"] += 1  # Incrémenter le compteur
+            with st.spinner(LABELS[lang]["writing"]):
+                prompt = f"Langue : {lang}. Activité : {activity}. Auteur : {author}\n"
+                prompt += "Crée un texte adapté aux enfants (6–14 ans), positif et créatif.\n"
+                for i, a in enumerate(answers, 1):
+                    if a:
+                        prompt += f"Q{i}: {a}\n"
 
-            try:
-                resp = client.chat.completions.create(
-                    model="gpt-4o-mini",
-                    messages=[
-                        {"role": "system", "content": "Tu es un assistant créatif pour enfants."},
-                        {"role": "user", "content": prompt},
-                    ],
-                    temperature=0.9,
-                    max_tokens=500,
-                )
-                story = resp.choices[0].message.content.strip()
-
-                st.success(LABELS[lang]["result_title"])
-                st.markdown(
-                    f"<div style='background:#fff0f6; padding:15px; border-radius:10px;'>{story}</div>",
-                    unsafe_allow_html=True
-                )
-
-                # Export PDF
-                def create_pdf(text):
-                    tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
-                    c = canvas.Canvas(tmp_file.name, pagesize=A4)
-                    width, height = A4
-
-                    c.setFont("Helvetica-Bold", 22)
-                    c.drawCentredString(width/2, height - 4*cm, "Atelier Créatif — EDU")
-                    c.setFont("Helvetica", 16)
-                    c.drawCentredString(width/2, height - 5*cm, activity)
-                    c.setFont("Helvetica-Oblique", 10)
-                    c.drawCentredString(width/2, height - 6*cm, datetime.now().strftime("%d/%m/%Y"))
-
-                    c.showPage()
-                    c.setFont("Helvetica", 12)
-                    y = height - 3*cm
-                    for line in text.split("\n"):
-                        for sub in [line[i:i+90] for i in range(0, len(line), 90)]:
-                            c.drawString(2*cm, y, sub)
-                            y -= 15
-                            if y < 2*cm:
-                                c.showPage()
-                                c.setFont("Helvetica", 12)
-                                y = height - 3*cm
-                    c.save()
-                    return tmp_file.name
-
-                pdf_path = create_pdf(story)
-                with open(pdf_path, "rb") as f:
-                    st.download_button(
-                        label=LABELS[lang]["pdf_dl"],
-                        data=f,
-                        file_name="atelier_creatif.pdf",
-                        mime="application/pdf",
-                        use_container_width=True
+                try:
+                    resp = client.chat.completions.create(
+                        model="gpt-4o-mini",
+                        messages=[
+                            {"role": "system", "content": "Tu es un assistant créatif pour enfants."},
+                            {"role": "user", "content": prompt},
+                        ],
+                        temperature=0.9,
+                        max_tokens=500,
                     )
-            except Exception as e:
-                st.error(f"❌ Erreur OpenAI : {e}")
+                    story = resp.choices[0].message.content.strip()
+
+                    st.success(LABELS[lang]["result_title"])
+                    st.markdown(
+                        f"<div style='background:#fff0f6; padding:15px; border-radius:10px;'>{story}</div>",
+                        unsafe_allow_html=True
+                    )
+
+                    # Export PDF (inchangé)
+                    def create_pdf(text):
+                        tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+                        c = canvas.Canvas(tmp_file.name, pagesize=A4)
+                        width, height = A4
+
+                        c.setFont("Helvetica-Bold", 22)
+                        c.drawCentredString(width/2, height - 4*cm, "Atelier Créatif — EDU")
+                        c.setFont("Helvetica", 16)
+                        c.drawCentredString(width/2, height - 5*cm, activity)
+                        c.setFont("Helvetica-Oblique", 10)
+                        c.drawCentredString(width/2, height - 6*cm, datetime.now().strftime("%d/%m/%Y"))
+
+                        c.showPage()
+                        c.setFont("Helvetica", 12)
+                        y = height - 3*cm
+                        for line in text.split("\n"):
+                            for sub in [line[i:i+90] for i in range(0, len(line), 90)]:
+                                c.drawString(2*cm, y, sub)
+                                y -= 15
+                                if y < 2*cm:
+                                    c.showPage()
+                                    c.setFont("Helvetica", 12)
+                                    y = height - 3*cm
+                        c.save()
+                        return tmp_file.name
+
+                    pdf_path = create_pdf(story)
+                    with open(pdf_path, "rb") as f:
+                        st.download_button(
+                            label=LABELS[lang]["pdf_dl"],
+                            data=f,
+                            file_name="atelier_creatif.pdf",
+                            mime="application/pdf",
+                            use_container_width=True
+                        )
+                except Exception as e:
+                    st.error(f"❌ Erreur OpenAI : {e}")
