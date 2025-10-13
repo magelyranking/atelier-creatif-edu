@@ -1,3 +1,4 @@
 streamlit
 openai
 reportlab
+Fix requirements.txt (ajout des dépendances manquantes)
