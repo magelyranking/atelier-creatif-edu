@@ -17,33 +17,68 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# =========================
+# CSS GLOBAL (UX améliorée)
+# =========================
 st.markdown(
     """
     <style>
-    body { background: #f0f8ff; }
-    .stButton>button {
-        border-radius: 10px;
-        padding: 0.5em 1em;
-        margin: 3px;
-        font-weight: 600;
+    /* Centrer le contenu et limiter la largeur */
+    .main .block-container {
+        max-width: 880px;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        margin: auto;
     }
-    .card {
+
+    /* Style des cartes questions */
+    .question-card {
         background: #ffffff;
-        border-radius: 15px;
-        padding: 15px;
-        margin: 10px 0;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        border-radius: 12px;
+        padding: 10px 14px;
+        margin: 6px 0 2px 0;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        font-size: 16px;
+        line-height: 1.4em;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* Suggestions en chips flexibles */
+    .suggestion-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+        margin-bottom: 8px;
     }
     .suggestion-btn {
-        display: inline-block;
-        margin: 3px;
-        padding: 0.3em 0.8em;
-        border-radius: 12px;
+        flex: none;
+        padding: 6px 14px;
+        border-radius: 20px;
         background: #e6f7ff;
         border: 1px solid #91d5ff;
         cursor: pointer;
+        font-size: 14px;
+        line-height: 1.3em;
     }
     .suggestion-btn:hover { background: #bae7ff; }
+
+    /* Inputs plus grands (mobile friendly) */
+    input, textarea {
+        width: 100% !important;
+        font-size: 16px !important;
+        padding: 10px !important;
+        border-radius: 8px;
+    }
+
+    /* Bloc résultat */
+    .result-box {
+        background:#fff0f6;
+        padding:15px;
+        border-radius:10px;
+        border: 1px solid #ffd6e7;
+    }
     </style>
     """,
     unsafe_allow_html=True
@@ -76,7 +111,8 @@ LABELS = {
         "tagline": "✨ Crée une histoire magique avec tes élèves",
         "result_title": "✨ Voici votre création :",
         "need_answers": "⚠️ Veuillez répondre à au moins une question.",
-        "writing": "⏳ Veuillez patienter, votre œuvre est en construction..."
+        "writing": "⏳ Veuillez patienter, votre œuvre est en construction...",
+        "tries_left": "Il vous reste {n} essai(s) sur 5."
     },
     "EN": {
         "title": "🎨 Creative Workshop — EDU",
@@ -92,7 +128,8 @@ LABELS = {
         "tagline": "✨ Create a magical story with your students",
         "result_title": "✨ Here is your creation:",
         "need_answers": "⚠️ Please answer at least one question.",
-        "writing": "⏳ Please wait, your creation is being written..."
+        "writing": "⏳ Please wait, your creation is being written...",
+        "tries_left": "You have {n} of 5 tries left."
     },
     "ES": {
         "title": "🎨 Taller Creativo — EDU",
@@ -108,7 +145,8 @@ LABELS = {
         "tagline": "✨ Crea una historia mágica con tus alumnos",
         "result_title": "✨ Aquí está tu creación:",
         "need_answers": "⚠️ Responde al menos a una pregunta.",
-        "writing": "⏳ Espere, su obra está en construcción..."
+        "writing": "⏳ Espere, su obra está en construcción...",
+        "tries_left": "Le quedan {n} intentos de 5."
     },
     "DE": {
         "title": "🎨 Kreativwerkstatt — EDU",
@@ -124,7 +162,8 @@ LABELS = {
         "tagline": "✨ Erstelle eine magische Geschichte mit deinen Schülern",
         "result_title": "✨ Hier ist deine Erstellung:",
         "need_answers": "⚠️ Bitte beantworte mindestens eine Frage.",
-        "writing": "⏳ Bitte warten, dein Werk wird erstellt..."
+        "writing": "⏳ Bitte warten, dein Werk wird erstellt...",
+        "tries_left": "Du hast noch {n} von 5 Versuchen."
     },
     "IT": {
         "title": "🎨 Laboratorio Creativo — EDU",
@@ -140,7 +179,8 @@ LABELS = {
         "tagline": "✨ Crea una storia magica con i tuoi studenti",
         "result_title": "✨ Ecco la tua creazione:",
         "need_answers": "⚠️ Rispondi ad almeno una domanda.",
-        "writing": "⏳ Attendere, la tua opera è in costruzione..."
+        "writing": "⏳ Attendere, la tua opera è in costruzione...",
+        "tries_left": "Ti restano {n} tentativi su 5."
     }
 }
 
@@ -149,45 +189,24 @@ LABELS = {
 # =========================
 if "lang" not in st.session_state:
     st.session_state.lang = "FR"
+if "essais" not in st.session_state:
+    st.session_state["essais"] = 0
 lang = st.session_state.lang
 
 # =========================
 # TITRE
 # =========================
-st.markdown(f"<h1 style='text-align: center; color: #ff69b4;'>{LABELS[lang]['title']}</h1>", unsafe_allow_html=True)
+st.markdown(
+    f"<h1 style='text-align: center; color: #ff69b4;'>{LABELS[lang]['title']}</h1>",
+    unsafe_allow_html=True
+)
 st.caption(LABELS[lang]["subtitle"])
 st.info("💡 Votre clé OpenAI est sécurisée via Streamlit Cloud (Secrets).")
 
 # =========================
-# CARROUSEL
-# =========================
-st.markdown("## 🎬 Inspirations")
-images = [
-    {"file": "slide1.jpg", "caption": LABELS[lang]["tagline"]},
-    {"file": "slide2.jpg", "caption": "🎭"},
-    {"file": "slide4.jpg", "caption": "🎵"},
-]
-if "carousel_index" not in st.session_state:
-    st.session_state.carousel_index = 0
-
-slider_val = st.slider(
-    LABELS[lang]["carousel_prompt"],
-    min_value=1, max_value=len(images),
-    value=st.session_state.carousel_index + 1,
-    key="carousel_slider"
-)
-st.session_state.carousel_index = slider_val - 1
-current = images[st.session_state.carousel_index]
-if os.path.exists(current["file"]):
-    st.image(current["file"], use_container_width=True, caption=current["caption"])
-else:
-    st.warning(f"Image introuvable : {current['file']}")
-
-# =========================
-# LANGUE & ACTIVITÉ
+# ACTIVITÉ + LANGUE
 # =========================
 st.markdown(f"### {LABELS[lang]['choose_lang']}")
-
 lang_buttons = {"🇫🇷 FR": "FR", "🇬🇧 EN": "EN", "🇪🇸 ES": "ES", "🇩🇪 DE": "DE", "🇮🇹 IT": "IT"}
 cols = st.columns(len(lang_buttons))
 for i, (label, code) in enumerate(lang_buttons.items()):
@@ -212,9 +231,8 @@ st.markdown(f"### {LABELS[lang]['author']}")
 author = st.text_input(LABELS[lang]["author_name"], "Ma classe")
 
 # =========================
-# QPACK + QUESTIONS
+# QPACK COMPLET (questions + suggestions)
 # =========================
-# (⚡ Ici j’insère le QPACK complet + boucle avec correctif suggestions + génération + PDF)
 QPACK = {
     "FR": {
         "Histoire": [
@@ -299,7 +317,7 @@ QPACK = {
         ],
         "Libre": [
             {"q": "¿Tipo de texto?", "sug": ["Carta", "Diario", "Diálogo"]},
-            {"q": "¿Tema?", "sug": ["Un secreto", "Una descubrimiento", "Un reto"]},
+            {"q": "¿Tema?", "sug": ["Un secreto", "Un descubrimiento", "Un reto"]},
             {"q": "¿Tono?", "sug": ["Humorístico", "Poético", "Emotivo"]},
         ],
     },
@@ -362,9 +380,8 @@ QPACK = {
         ],
     },
 }
-
 # =========================
-# AFFICHAGE QUESTIONS
+# AFFICHAGE QUESTIONS (UI améliorée)
 # =========================
 st.markdown(f"### {LABELS[lang]['answer']}")
 st.caption(LABELS[lang]["hint"])
@@ -374,52 +391,59 @@ questions = QPACK.get(lang, QPACK["FR"]).get(activity, [])
 progress = st.progress(0)
 
 for i, q in enumerate(questions, start=1):
-    with st.container():
-        st.markdown(f"<div class='card'><b>{i}. {q['q']}</b></div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='question-card'><b>{i}. {q['q']}</b></div>", unsafe_allow_html=True)
 
-        key_text = f"text_{i}"
-        if key_text not in st.session_state:
-            st.session_state[key_text] = ""
+    key_text = f"text_{i}"
+    if key_text not in st.session_state:
+        st.session_state[key_text] = ""
 
-        # Suggestions -> remplissage
-        sug_cols = st.columns(len(q["sug"]))
-        for j, sug in enumerate(q["sug"]):
-            if sug_cols[j].button(sug, key=f"btn_{i}_{j}"):
-                st.session_state[key_text] = sug
-                st.rerun()
+    # Suggestions en chips flexibles (wrap)
+    st.markdown("<div class='suggestion-wrap'>", unsafe_allow_html=True)
+    for j, sug in enumerate(q["sug"]):
+        if st.button(sug, key=f"btn_{i}_{j}"):
+            st.session_state[key_text] = sug
+            st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
 
-        val = st.text_input("", key=key_text)
-        answers.append(val)
+    # Zone de saisie confortable (évite le débordement sur iPhone)
+    val = st.text_area("", key=key_text, height=48)
+    answers.append(val)
 
     progress.progress(int(i / max(1, len(questions)) * 100))
 
-# =========================
-# GENERATION TEXTE + PDF
-# =========================
-# =========================
-# =========================
-# ESSAIS GRATUITS + GENERATION
-# =========================
-if "essais" not in st.session_state:
-    st.session_state["essais"] = 0
+# Petit indicateur d’essais restants
+st.caption(LABELS[lang]["tries_left"].format(n=max(0, 5 - st.session_state["essais"])))
 
+# =========================
+# GENERATION (Quota 5 essais)
+# =========================
 if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary"):
     if not any(answers):
         st.error(LABELS[lang]["need_answers"])
     else:
-        # Vérifier le quota
         if st.session_state["essais"] >= 5:
-            st.warning("🚫 Vous avez atteint vos 5 essais gratuits.\n\n👉 Contactez-nous pour continuer ou débloquer un accès complet.")
+            st.warning("🚫 Vous avez atteint vos 5 essais gratuits.")
         else:
-            st.session_state["essais"] += 1  # Incrémenter le compteur
+            st.session_state["essais"] += 1
             with st.spinner(LABELS[lang]["writing"]):
                 try:
+                    # Construire le prompt
                     prompt = f"Langue : {lang}. Activité : {activity}. Auteur : {author}\n"
-                    prompt += "Crée un texte adapté aux enfants (6–14 ans), positif et créatif.\n"
-                    for i, a in enumerate(answers, 1):
-                        if a:
-                            prompt += f"Q{i}: {a}\n"
+                    prompt += "Crée un texte adapté aux enfants (6–14 ans), positif, créatif et bienveillant.\n"
+                    if activity == "Poème":
+                        prompt += "Forme poétique simple et rythmée; 8–16 vers max.\n"
+                    elif activity == "Chanson":
+                        prompt += "Couplets courts + refrain simple et mémorisable.\n"
+                    elif activity == "Saynette":
+                        prompt += "Petit dialogue théâtral (2–4 personnages), 6–12 répliques.\n"
+                    elif activity == "Histoire":
+                        prompt += "Structure courte: début, problème, solution, fin heureuse.\n"
 
+                    for k, a in enumerate(answers, 1):
+                        if a:
+                            prompt += f"Q{k}: {a}\n"
+
+                    # Appel OpenAI
                     resp = client.chat.completions.create(
                         model="gpt-4o-mini",
                         messages=[
@@ -427,26 +451,21 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
                             {"role": "user", "content": prompt},
                         ],
                         temperature=0.9,
-                        max_tokens=500,
+                        max_tokens=700,
                     )
+                    story = resp.choices[0].message.content.strip()
 
-                    try:
-                        story = resp.choices[0].message.content.strip()
-                    except Exception:
-                        story = resp.choices[0].message["content"].strip()
-
+                    # Affichage résultat
                     st.success(LABELS[lang]["result_title"])
-                    st.markdown(
-                        f"<div style='background:#fff0f6; padding:15px; border-radius:10px;'>{story}</div>",
-                        unsafe_allow_html=True
-                    )
+                    st.markdown(f"<div class='result-box'>{story}</div>", unsafe_allow_html=True)
 
                     # Export PDF
-                    def create_pdf(text):
+                    def create_pdf(text: str) -> str:
                         tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
                         c = canvas.Canvas(tmp_file.name, pagesize=A4)
                         width, height = A4
 
+                        # Page de garde
                         c.setFont("Helvetica-Bold", 22)
                         c.drawCentredString(width/2, height - 4*cm, "Atelier Créatif — EDU")
                         c.setFont("Helvetica", 16)
@@ -454,11 +473,14 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
                         c.setFont("Helvetica-Oblique", 10)
                         c.drawCentredString(width/2, height - 6*cm, datetime.now().strftime("%d/%m/%Y"))
 
+                        # Corps
                         c.showPage()
                         c.setFont("Helvetica", 12)
                         y = height - 3*cm
                         for line in text.split("\n"):
-                            for sub in [line[i:i+90] for i in range(0, len(line), 90)]:
+                            # wrap manuel
+                            parts = [line[i:i+90] for i in range(0, len(line), 90)] if line else [""]
+                            for sub in parts:
                                 c.drawString(2*cm, y, sub)
                                 y -= 15
                                 if y < 2*cm:
@@ -477,5 +499,7 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
                             mime="application/pdf",
                             use_container_width=True
                         )
+
                 except Exception as e:
                     st.error(f"❌ Erreur OpenAI : {e}")
+
