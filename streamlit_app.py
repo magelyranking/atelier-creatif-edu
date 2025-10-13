@@ -76,7 +76,7 @@ LABELS = {
         "tagline": "✨ Crée une histoire magique avec tes élèves",
         "result_title": "✨ Voici votre création :",
         "need_answers": "⚠️ Veuillez répondre à au moins une question.",
-        "writing": "✍️ L'IA écrit votre création..."
+        "writing": "⏳ Veuillez patienter, votre œuvre est en construction..."
     },
     "EN": {
         "title": "🎨 Creative Workshop — EDU",
@@ -92,7 +92,7 @@ LABELS = {
         "tagline": "✨ Create a magical story with your students",
         "result_title": "✨ Here is your creation:",
         "need_answers": "⚠️ Please answer at least one question.",
-        "writing": "✍️ AI is writing your piece..."
+        "writing": "⏳ Please wait, your creation is being written..."
     },
     "ES": {
         "title": "🎨 Taller Creativo — EDU",
@@ -108,7 +108,7 @@ LABELS = {
         "tagline": "✨ Crea una historia mágica con tus alumnos",
         "result_title": "✨ Aquí está tu creación:",
         "need_answers": "⚠️ Responde al menos a una pregunta.",
-        "writing": "✍️ La IA está escribiendo tu creación..."
+        "writing": "⏳ Espere, su obra está en construcción..."
     },
     "DE": {
         "title": "🎨 Kreativwerkstatt — EDU",
@@ -124,7 +124,7 @@ LABELS = {
         "tagline": "✨ Erstelle eine magische Geschichte mit deinen Schülern",
         "result_title": "✨ Hier ist deine Erstellung:",
         "need_answers": "⚠️ Bitte beantworte mindestens eine Frage.",
-        "writing": "✍️ Die KI schreibt deinen Text..."
+        "writing": "⏳ Bitte warten, dein Werk wird erstellt..."
     },
     "IT": {
         "title": "🎨 Laboratorio Creativo — EDU",
@@ -140,7 +140,7 @@ LABELS = {
         "tagline": "✨ Crea una storia magica con i tuoi studenti",
         "result_title": "✨ Ecco la tua creazione:",
         "need_answers": "⚠️ Rispondi ad almeno una domanda.",
-        "writing": "✍️ L'IA sta scrivendo la tua creazione..."
+        "writing": "⏳ Attendere, la tua opera è in costruzione..."
     }
 }
 
@@ -188,7 +188,6 @@ else:
 # =========================
 st.markdown(f"### {LABELS[lang]['choose_lang']}")
 
-# Choix langue
 lang_buttons = {"🇫🇷 FR": "FR", "🇬🇧 EN": "EN", "🇪🇸 ES": "ES", "🇩🇪 DE": "DE", "🇮🇹 IT": "IT"}
 cols = st.columns(len(lang_buttons))
 for i, (label, code) in enumerate(lang_buttons.items()):
@@ -197,7 +196,6 @@ for i, (label, code) in enumerate(lang_buttons.items()):
         st.rerun()
 lang = st.session_state.lang
 
-# Choix activité
 activities = ["Histoire", "Saynette", "Poème", "Chanson", "Libre"]
 cols = st.columns(len(activities))
 for i, act in enumerate(activities):
@@ -214,11 +212,9 @@ st.markdown(f"### {LABELS[lang]['author']}")
 author = st.text_input(LABELS[lang]["author_name"], "Ma classe")
 
 # =========================
-# QPACK COMPLET
+# QPACK + QUESTIONS
 # =========================
-# ⚡ ici tu veux que je colle TOUT le QPACK multilingue (FR, EN, ES, DE, IT),
-# sinon ton fichier sera incomplet. Comme c’est très long,
-# veux-tu que je continue et colle la partie QPACK + génération texte + PDF dans le prochain message ?
+# (⚡ Ici j’insère le QPACK complet + boucle avec correctif suggestions + génération + PDF)
 QPACK = {
     "FR": {
         "Histoire": [
@@ -381,27 +377,21 @@ for i, q in enumerate(questions, start=1):
     with st.container():
         st.markdown(f"<div class='card'><b>{i}. {q['q']}</b></div>", unsafe_allow_html=True)
 
-        # Clé stable pour ce champ
         key_text = f"text_{i}"
-
-        # Initialisation si absent
         if key_text not in st.session_state:
             st.session_state[key_text] = ""
 
-        # Suggestions : clic = remplir la valeur + relancer
+        # Suggestions -> remplissage
         sug_cols = st.columns(len(q["sug"]))
         for j, sug in enumerate(q["sug"]):
             if sug_cols[j].button(sug, key=f"btn_{i}_{j}"):
                 st.session_state[key_text] = sug
                 st.rerun()
 
-        # Champ texte lié à la session, sans value=
         val = st.text_input("", key=key_text)
         answers.append(val)
 
     progress.progress(int(i / max(1, len(questions)) * 100))
-
-
 
 # =========================
 # GENERATION TEXTE + PDF
@@ -435,7 +425,7 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
                     unsafe_allow_html=True
                 )
 
-                # ------- Export PDF -------
+                # Export PDF
                 def create_pdf(text):
                     tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
                     c = canvas.Canvas(tmp_file.name, pagesize=A4)
