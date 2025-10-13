@@ -126,6 +126,18 @@ div[role="radiogroup"] label span {
     font-size: 15px;
     word-wrap: break-word;
 }
+/* Forcer couleur du texte dans les questions */
+.question-card {
+    color: #000000 !important;
+    font-size: 15px !important;
+}
+
+/* Forcer couleur et visibilité du texte dans les champs input */
+input[type="text"] {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    font-size: 15px !important;
+}
   
     </style>
     """,
@@ -439,10 +451,10 @@ questions = QPACK.get(lang, QPACK["FR"]).get(activity, [])
 progress = st.progress(0)
 
 for i, q in enumerate(questions, start=1):
-    st.markdown(
-        f"<div class='question-card'><b>{i}. {q['q']}</b></div>",
-        unsafe_allow_html=True
-    )
+st.markdown(
+    f"<div class='question-card'><b>{i}. {q['q']}</b></div>",
+    unsafe_allow_html=True
+)
 
     # Clé unique pour chaque question
     key_text = f"answer_{activity}_{lang}_{i}"
