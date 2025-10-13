@@ -118,7 +118,8 @@ with c3:
 # -----------------------
 # LANGUE & ACTIVITÉ
 # -----------------------
-st.markdown("### 🌍 Choisissez la langue et l’activité")
+st.markdown(f"### {LABELS[lang]['choose_activity']}")
+
 
 lang_buttons = {"🇫🇷 FR": "FR", "🇬🇧 EN": "EN", "🇪🇸 ES": "ES", "🇩🇪 DE": "DE", "🇮🇹 IT": "IT"}
 cols = st.columns(len(lang_buttons))
@@ -149,8 +150,8 @@ activity = st.session_state.activity
 # -----------------------
 # CHAMP AUTEUR
 # -----------------------
-st.markdown("### ✍️ Auteur")
-author = st.text_input("Nom de l’auteur :", "Ma classe")
+st.markdown(f"### {LABELS[lang]['author_title']}")
+author = st.text_input(LABELS[lang]['author_name'], "Ma classe")
 
 # -----------------------
 # QUESTIONS + SUGGESTIONS (5 langues × 5 activités)
@@ -307,8 +308,8 @@ QPACK = {
 # -----------------------
 # AFFICHAGE QUESTIONS
 # -----------------------
-st.markdown("### 📝 Répondez aux questions")
-st.caption("💡 Utilisez les suggestions en cliquant dessus ou ajoutez votre idée.")
+st.markdown(f"### {LABELS[lang]['questions']}")
+st.caption(LABELS[lang]['hint'])
 
 answers = []
 questions = QPACK.get(lang, QPACK["FR"]).get(activity, [])
@@ -333,7 +334,7 @@ for i, q in enumerate(questions, start=1):
 # -----------------------
 # GÉNÉRATION DU TEXTE
 # -----------------------
-if st.button("🪄 Générer le texte", use_container_width=True, type="primary"):
+if st.button(LABELS[lang]['generate'], use_container_width=True, type="primary"):
     if not any(answers):
         st.error("⚠️ Veuillez répondre à au moins une question.")
     else:
