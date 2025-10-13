@@ -228,6 +228,20 @@ div[role="radiogroup"] > label[data-checked="true"] {
     border: 1px solid #1890ff !important;
     -webkit-text-fill-color: #ffffff !important;
 }
+/* Forcer affichage texte suggestions (Safari iOS) */
+button[kind="secondary"] {
+    background: #ffffff !important;
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    border: 1px solid #91d5ff !important;
+    font-size: 14px !important;
+}
+
+button[kind="secondary"]:hover {
+    background: #e6f7ff !important;
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+}
 
     </style>
     """,
