@@ -110,7 +110,15 @@ div[role="radiogroup"] > label[data-checked="true"] {
     color: white;
     border: 1px solid #1890ff;
 }
-    
+ /* Forcer affichage du texte dans les radios Streamlit (mobile/iPhone fix) */
+div[role="radiogroup"] label span {
+    display: inline !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font-size: 15px !important;
+    white-space: nowrap; /* garde les mots lisibles */
+}
+   
     </style>
     """,
     unsafe_allow_html=True
