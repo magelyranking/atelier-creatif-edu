@@ -187,7 +187,7 @@ div[role="radiogroup"] label span {
 div[role="radiogroup"] > label[data-checked="true"] span {
     color: #ffffff !important;
 }
-/* Désactiver le mode sombre forcé de Safari iOS */
+/* Désactiver le mode sombre automatique de Safari iOS */
 html, body {
     color-scheme: only light !important;
     -webkit-appearance: none !important;
@@ -195,49 +195,38 @@ html, body {
     color: #000000 !important;
 }
 
-/* Suggestions (chips) */
+/* Suggestions (toujours lisibles) */
 .suggestion-btn {
-    background: #ffffff !important;
-    color: #000000 !important;
+    background: #ffffff !important;     /* fond blanc */
+    color: #000000 !important;          /* texte noir */
     border: 1px solid #91d5ff !important;
+    -webkit-text-fill-color: #000000 !important; /* iOS force texte noir */
 }
-
-/* Radios (langue + activité) */
-div[role="radiogroup"] > label {
-    background: #ffffff !important;
-    color: #000000 !important;
-    border: 1px solid #91d5ff !important;
-}
-div[role="radiogroup"] > label[data-checked="true"] {
-    background: #1890ff !important;
-    color: #ffffff !important;
-}
-
-/* Forcer le texte dans les radios visibles */
-div[role="radiogroup"] label span {
-    display: inline !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    color: #000000 !important;
-}
-div[role="radiogroup"] > label[data-checked="true"] span {
-    color: #ffffff !important;
-}
-/* Forcer visibilité du texte dans les suggestions (iPhone fix) */
-.suggestion-btn {
-    background: #ffffff !important;  /* fond blanc */
-    color: #000000 !important;       /* texte noir toujours visible */
-    border: 1px solid #91d5ff !important;
-    display: inline-block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    -webkit-text-fill-color: #000000 !important; /* iOS fix */
-}
-
 .suggestion-btn:hover {
     background: #e6f7ff !important;
     color: #000000 !important;
     -webkit-text-fill-color: #000000 !important;
+}
+
+/* Boutons radio (langues + activités) */
+div[role="radiogroup"] > label {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #91d5ff !important;
+    border-radius: 20px;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1.3em;
+    -webkit-text-fill-color: #000000 !important;
+}
+
+/* Quand sélectionné */
+div[role="radiogroup"] > label[data-checked="true"] {
+    background: #1890ff !important;
+    color: #ffffff !important;
+    border: 1px solid #1890ff !important;
+    -webkit-text-fill-color: #ffffff !important;
 }
 
     </style>
