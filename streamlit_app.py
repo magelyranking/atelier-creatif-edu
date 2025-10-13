@@ -118,7 +118,15 @@ div[role="radiogroup"] label span {
     font-size: 15px !important;
     white-space: nowrap; /* garde les mots lisibles */
 }
-   
+ .question-card {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 6px 10px;
+    margin: 4px 0;
+    font-size: 15px;
+    word-wrap: break-word;
+}
+  
     </style>
     """,
     unsafe_allow_html=True
@@ -442,15 +450,12 @@ for i, q in enumerate(questions, start=1):
         st.session_state[key_text] = ""
 
     # Suggestions affichées en ligne
-    choice = st.radio(
-        " ",
-        q["sug"],
-        horizontal=True,
-        key=f"radio_{i}",
-        label_visibility="collapsed"
-    )
-    if choice:
-        st.session_state[key_text] = choice
+  # Suggestions sous forme de boutons en ligne (compatible mobile)
+cols = st.columns(len(q["sug"]))
+for j, sug in enumerate(q["sug"]):
+    if cols[j].button(sug, key=f"btn_{i}_{j}"):
+        st.session_state[key_text] = sug
+
 
     # Champ compact pour modifier ou entrer autre chose
     val = st.text_input(" ", key=key_text, label_visibility="collapsed")
