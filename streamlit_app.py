@@ -381,17 +381,20 @@ for i, q in enumerate(questions, start=1):
     with st.container():
         st.markdown(f"<div class='card'><b>{i}. {q['q']}</b></div>", unsafe_allow_html=True)
 
-        clicked_suggestion = None
+        # Assurer un état initial
+        if f"q{i}" not in st.session_state:
+            st.session_state[f"q{i}"] = ""
+
+        # Boutons de suggestions
         sug_cols = st.columns(len(q["sug"]))
         for j, sug in enumerate(q["sug"]):
             if sug_cols[j].button(sug, key=f"sugbtn_{i}_{j}"):
-                clicked_suggestion = sug
+                st.session_state[f"q{i}"] = sug   # clic = préremplissage
 
-        default_val = st.session_state.get(f"q{i}", "")
-        if clicked_suggestion:
-            default_val = clicked_suggestion
+        # Champ texte lié à l'état
+        val = st.text_input("", value=st.session_state[f"q{i}"], key=f"text_{i}")
+        st.session_state[f"q{i}"] = val  # mise à jour si modifié manuellement
 
-        val = st.text_input("", value=default_val, key=f"q{i}")
         answers.append(val)
 
     progress.progress(int(i / max(1, len(questions)) * 100))
