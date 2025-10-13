@@ -411,27 +411,29 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
             st.warning("🚫 Vous avez atteint vos 5 essais gratuits.\n\n👉 Contactez-nous pour continuer ou débloquer un accès complet.")
         else:
             st.session_state["essais"] += 1  # Incrémenter le compteur
-            with st.spinner(LABELS[lang]["writing"]):
-                prompt = f"Langue : {lang}. Activité : {activity}. Auteur : {author}\n"
-                prompt += "Crée un texte adapté aux enfants (6–14 ans), positif et créatif.\n"
-                for i, a in enumerate(answers, 1):
-                    if a:
-                        prompt += f"Q{i}: {a}\n"
-          resp = client.chat.completions.create(
-    model="gpt-4o-mini",
-    messages=[
-        {"role": "system", "content": "Tu es un assistant créatif pour enfants."},
-        {"role": "user", "content": prompt},
-    ],
-    temperature=0.9,
-    max_tokens=500,
-)
+          with st.spinner(LABELS[lang]["writing"]):
+    prompt = f"Langue : {lang}. Activité : {activity}. Auteur : {author}\n"
+    prompt += "Crée un texte adapté aux enfants (6–14 ans), positif et créatif.\n"
+    for i, a in enumerate(answers, 1):
+        if a:
+            prompt += f"Q{i}: {a}\n"
 
-# ✅ Bloc complet, pas de "try:" tout seul !
-try:
-    story = resp.choices[0].message.content.strip()
-except Exception:
-    story = resp.choices[0].message["content"].strip()
+    # 👇 Bien aligné avec prompt +=
+    resp = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "Tu es un assistant créatif pour enfants."},
+            {"role": "user", "content": prompt},
+        ],
+        temperature=0.9,
+        max_tokens=500,
+    )
+
+    try:
+        story = resp.choices[0].message.content.strip()
+    except Exception:
+        story = resp.choices[0].message["content"].strip()
+
 
 
                     st.success(LABELS[lang]["result_title"])
