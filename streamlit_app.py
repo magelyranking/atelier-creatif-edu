@@ -310,7 +310,7 @@ else:
 # ACTIVITÉ + LANGUE
 # =========================
 st.markdown(f"### {LABELS[lang]['choose_lang']}")
-l# =========================
+# =========================
 # LANGUE
 # =========================
 lang = st.radio(
