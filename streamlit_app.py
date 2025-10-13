@@ -268,6 +268,38 @@ st.markdown(
 )
 st.caption(LABELS[lang]["subtitle"])
 st.info("💡 Votre clé OpenAI est sécurisée via Streamlit Cloud (Secrets).")
+# =========================
+# CARROUSEL / SLIDER D'INSPIRATION
+# =========================
+st.markdown("## 🎬 Inspirations")
+
+images = [
+    {"file": "slide1.jpg", "caption": LABELS[lang]["tagline"]},
+    {"file": "slide2.jpg", "caption": "🎭"},
+    {"file": "slide4.jpg", "caption": "🎵"},
+]
+
+# Index initial
+if "carousel_index" not in st.session_state:
+    st.session_state.carousel_index = 0
+
+# Slider
+slider_val = st.slider(
+    LABELS[lang]["carousel_prompt"],
+    min_value=1, max_value=len(images),
+    value=st.session_state.carousel_index + 1,
+    key="carousel_slider"
+)
+
+# Mettre à jour l’index
+st.session_state.carousel_index = slider_val - 1
+current = images[st.session_state.carousel_index]
+
+# Afficher l’image si dispo
+if os.path.exists(current["file"]):
+    st.image(current["file"], use_container_width=True, caption=current["caption"])
+else:
+    st.warning(f"Image introuvable : {current['file']}")
 
 # =========================
 # ACTIVITÉ + LANGUE
