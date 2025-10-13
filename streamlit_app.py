@@ -467,7 +467,13 @@ for i, q in enumerate(questions, start=1):
             st.session_state[key_text] = sug
 
     # Champ texte lié à la question
-    val = st.text_input(" ", key=key_text, label_visibility="collapsed")
+    val = st.text_input(
+    " ",
+    key=key_text,
+    label_visibility="collapsed",
+    placeholder="✍️ Saisissez votre idée ou cliquez sur une suggestion"
+)
+
     answers.append(val)
 
     # Barre de progression
