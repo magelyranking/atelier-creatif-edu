@@ -144,6 +144,50 @@ st.markdown(
         background-color: #f9f9f9 !important;
         color: #000000 !important;
     }
+    /* === Fix iPhone / iPad dark mode pour Suggestions et Radios === */
+
+/* Suggestions (chips) */
+.suggestion-btn {
+    background: #ffffff !important;   /* fond blanc */
+    color: #000000 !important;        /* texte noir */
+    border: 1px solid #91d5ff !important;
+    display: inline-block !important; /* forcer affichage */
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+.suggestion-btn:hover {
+    background: #e6f7ff !important;
+    color: #000000 !important;
+}
+
+/* Radios (activités/langues) */
+div[role="radiogroup"] > label {
+    background: #ffffff !important;   /* fond blanc */
+    border: 1px solid #91d5ff !important;
+    color: #000000 !important;        /* texte noir */
+    display: inline-flex !important;  /* forcer le texte à s'afficher */
+    align-items: center !important;
+    justify-content: center !important;
+}
+div[role="radiogroup"] > label[data-checked="true"] {
+    background: #1890ff !important;   /* bleu sélection */
+    color: #ffffff !important;        /* texte blanc lisible */
+}
+
+/* Forcer affichage du texte dans les radios */
+div[role="radiogroup"] label span {
+    display: inline !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: #000000 !important;        /* texte noir par défaut */
+    font-size: 15px !important;
+}
+
+/* Quand sélectionné, texte devient blanc */
+div[role="radiogroup"] > label[data-checked="true"] span {
+    color: #ffffff !important;
+}
+
     </style>
     """,
     unsafe_allow_html=True
