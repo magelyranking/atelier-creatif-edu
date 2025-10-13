@@ -508,13 +508,13 @@ for i, q in enumerate(questions, start=1):
     # Clé unique
     key_text = f"answer_{activity}_{lang}_{i}"
 
-    # Suggestions sous forme de boutons
+    # Suggestions en boutons
     cols = st.columns(len(q["sug"]))
     for j, sug in enumerate(q["sug"]):
         if cols[j].button(sug, key=f"btn_{activity}_{lang}_{i}_{j}"):
             st.session_state[key_text] = sug
 
-    # Champ texte avec placeholder multilingue
+    # Champ texte avec placeholder
     val = st.text_input(
         " ",
         key=key_text,
