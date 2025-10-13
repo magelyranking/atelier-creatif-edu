@@ -489,7 +489,7 @@ placeholders = {
 }
 
 # =========================
-# AFFICHAGE QUESTIONS
+# AFFICHAGE QUESTIONS (corrigé, compact, lisible)
 # =========================
 st.markdown(f"### {LABELS[lang]['answer']}")
 st.caption(LABELS[lang]["hint"])
@@ -508,13 +508,13 @@ for i, q in enumerate(questions, start=1):
     # Clé unique
     key_text = f"answer_{activity}_{lang}_{i}"
 
-    # Suggestions en boutons
+    # Suggestions en boutons côte à côte
     cols = st.columns(len(q["sug"]))
     for j, sug in enumerate(q["sug"]):
         if cols[j].button(sug, key=f"btn_{activity}_{lang}_{i}_{j}"):
             st.session_state[key_text] = sug
 
-    # Champ texte avec placeholder
+    # Champ texte lié à la question (bien fermé !)
     val = st.text_input(
         " ",
         key=key_text,
