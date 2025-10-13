@@ -592,11 +592,13 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
                     story = resp.choices[0].message.content.strip()
 
                     # Affichage résultat
-                   st.success(LABELS[lang]["result_title"])
+# Affichage résultat
+st.success(LABELS[lang]["result_title"])
 st.markdown(
     f"<div class='result-box'>{story}</div>",
     unsafe_allow_html=True
 )
+
 
 
                     # Export PDF
