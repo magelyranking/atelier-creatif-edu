@@ -7,9 +7,9 @@ import tempfile
 from datetime import datetime
 import os
 
-# -----------------------
+# =========================
 # CONFIG APP
-# -----------------------
+# =========================
 st.set_page_config(
     page_title="Atelier Créatif — EDU",
     page_icon="🎨",
@@ -34,95 +34,145 @@ st.markdown(
         margin: 10px 0;
         box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
+    .suggestion-btn {
+        display: inline-block;
+        margin: 3px;
+        padding: 0.3em 0.8em;
+        border-radius: 12px;
+        background: #e6f7ff;
+        border: 1px solid #91d5ff;
+        cursor: pointer;
+    }
     .suggestion-btn:hover { background: #bae7ff; }
     </style>
     """,
     unsafe_allow_html=True
 )
 
-# -----------------------
+# =========================
 # OPENAI
-# -----------------------
+# =========================
 api_key = os.environ.get("OPENAI_API_KEY")
 if not api_key:
     st.error("⚠️ Aucune clé API trouvée. Ajoutez OPENAI_API_KEY dans les Secrets Streamlit Cloud.")
     st.stop()
 client = OpenAI(api_key=api_key)
 
-# -----------------------
+# =========================
 # LABELS UI (TRADUCTIONS)
-# -----------------------
+# =========================
 LABELS = {
     "FR": {
-        "choose_activity": "🌍 Choisissez la langue et l’activité",
+        "title": "🎨 Atelier Créatif — EDU",
+        "subtitle": "Créez facilement des histoires, poèmes, chansons ou saynettes pour vos élèves (6–14 ans). Répondez aux questions ➝ téléchargez en PDF ✨",
+        "choose_lang": "🌍 Choisissez la langue et l’activité",
         "author": "✍️ Auteur",
         "author_name": "Nom de l’auteur :",
         "answer": "📝 Répondez aux questions",
         "hint": "💡 Utilisez les suggestions en cliquant dessus ou ajoutez votre idée.",
         "generate": "🪄 Générer le texte",
-        "tagline": "✨ Crée une histoire magique avec tes élèves"
+        "pdf_dl": "⬇️ Télécharger en PDF",
+        "carousel_prompt": "Sélectionne une image",
+        "tagline": "✨ Crée une histoire magique avec tes élèves",
+        "result_title": "✨ Voici votre création :",
+        "need_answers": "⚠️ Veuillez répondre à au moins une question.",
+        "writing": "✍️ L'IA écrit votre création..."
     },
     "EN": {
-        "choose_activity": "🌍 Choose the language and activity",
+        "title": "🎨 Creative Workshop — EDU",
+        "subtitle": "Easily create stories, poems, songs or skits for students (6–14). Answer the prompts ➝ download as PDF ✨",
+        "choose_lang": "🌍 Choose the language and activity",
         "author": "✍️ Author",
         "author_name": "Author’s name:",
         "answer": "📝 Answer the questions",
         "hint": "💡 Use the suggestions by clicking them or add your own idea.",
         "generate": "🪄 Generate text",
-        "tagline": "✨ Create a magical story with your students"
+        "pdf_dl": "⬇️ Download PDF",
+        "carousel_prompt": "Pick an image",
+        "tagline": "✨ Create a magical story with your students",
+        "result_title": "✨ Here is your creation:",
+        "need_answers": "⚠️ Please answer at least one question.",
+        "writing": "✍️ AI is writing your piece..."
     },
     "ES": {
-        "choose_activity": "🌍 Elige el idioma y la actividad",
+        "title": "🎨 Taller Creativo — EDU",
+        "subtitle": "Crea fácilmente historias, poemas, canciones o escenitas para alumnos (6–14). Responde las preguntas ➝ descarga en PDF ✨",
+        "choose_lang": "🌍 Elige el idioma y la actividad",
         "author": "✍️ Autor",
         "author_name": "Nombre del autor:",
         "answer": "📝 Responde a las preguntas",
         "hint": "💡 Usa las sugerencias haciendo clic o añade tu propia idea.",
         "generate": "🪄 Generar texto",
-        "tagline": "✨ Crea una historia mágica con tus alumnos"
+        "pdf_dl": "⬇️ Descargar en PDF",
+        "carousel_prompt": "Selecciona una imagen",
+        "tagline": "✨ Crea una historia mágica con tus alumnos",
+        "result_title": "✨ Aquí está tu creación:",
+        "need_answers": "⚠️ Responde al menos a una pregunta.",
+        "writing": "✍️ La IA está escribiendo tu creación..."
     },
     "DE": {
-        "choose_activity": "🌍 Wähle die Sprache und Aktivität",
+        "title": "🎨 Kreativwerkstatt — EDU",
+        "subtitle": "Erstelle leicht Geschichten, Gedichte, Lieder oder Sketche für Schüler (6–14). Beantworte die Fragen ➝ als PDF herunterladen ✨",
+        "choose_lang": "🌍 Wähle die Sprache und Aktivität",
         "author": "✍️ Autor",
         "author_name": "Name des Autors:",
         "answer": "📝 Beantworte die Fragen",
-        "hint": "💡 Nutze die Vorschläge oder füge deine eigene Idee hinzu.",
+        "hint": "💡 Nutze die Vorschläge per Klick oder füge deine eigene Idee hinzu.",
         "generate": "🪄 Text generieren",
-        "tagline": "✨ Erstelle eine magische Geschichte mit deinen Schülern"
+        "pdf_dl": "⬇️ Als PDF herunterladen",
+        "carousel_prompt": "Wähle ein Bild",
+        "tagline": "✨ Erstelle eine magische Geschichte mit deinen Schülern",
+        "result_title": "✨ Hier ist deine Erstellung:",
+        "need_answers": "⚠️ Bitte beantworte mindestens eine Frage.",
+        "writing": "✍️ Die KI schreibt deinen Text..."
     },
     "IT": {
-        "choose_activity": "🌍 Scegli la lingua e l’attività",
+        "title": "🎨 Laboratorio Creativo — EDU",
+        "subtitle": "Crea facilmente storie, poesie, canzoni o scenette per studenti (6–14). Rispondi alle domande ➝ scarica in PDF ✨",
+        "choose_lang": "🌍 Scegli la lingua e l’attività",
         "author": "✍️ Autore",
         "author_name": "Nome dell’autore:",
         "answer": "📝 Rispondi alle domande",
-        "hint": "💡 Usa i suggerimenti facendo clic o aggiungi la tua idea.",
+        "hint": "💡 Usa i suggerimenti con un clic oppure aggiungi la tua idea.",
         "generate": "🪄 Genera il testo",
-        "tagline": "✨ Crea una storia magica con i tuoi studenti"
+        "pdf_dl": "⬇️ Scarica in PDF",
+        "carousel_prompt": "Seleziona un’immagine",
+        "tagline": "✨ Crea una storia magica con i tuoi studenti",
+        "result_title": "✨ Ecco la tua creazione:",
+        "need_answers": "⚠️ Rispondi ad almeno una domanda.",
+        "writing": "✍️ L'IA sta scrivendo la tua creazione..."
     }
 }
 
-# Libellés des activités (les codes d’activité restent FR pour la logique)
+# Activités (clés FR pour la logique), mais libellés traduits par langue
 ACTIVITY_LABELS = {
     "FR": {"Histoire": "📚 Histoire", "Saynette": "🎭 Saynette", "Poème": "✒️ Poème", "Chanson": "🎵 Chanson", "Libre": "✨ Libre"},
     "EN": {"Histoire": "📚 Story", "Saynette": "🎭 Skit", "Poème": "✒️ Poem", "Chanson": "🎵 Song", "Libre": "✨ Free"},
     "ES": {"Histoire": "📚 Historia", "Saynette": "🎭 Escenita", "Poème": "✒️ Poema", "Chanson": "🎵 Canción", "Libre": "✨ Libre"},
     "DE": {"Histoire": "📚 Geschichte", "Saynette": "🎭 Sketch", "Poème": "✒️ Gedicht", "Chanson": "🎵 Lied", "Libre": "✨ Frei"},
-    "IT": {"Histoire": "📚 Storia", "Saynette": "🎭 Scenetta", "Poème": "✒️ Poesia", "Chanson": "🎵 Canzone", "Libre": "✨ Libero"},
+    "IT": {"Histoire": "📚 Storia", "Saynette": "🎭 Scenetta", "Poème": "✒️ Poesia", "Chanson": "🎵 Canzone", "Libre": "✨ Libero"}
 }
 
-# -----------------------
+# =========================
 # TITRE
-# -----------------------
-st.markdown("<h1 style='text-align: center; color: #ff69b4;'>🎨 Atelier Créatif — EDU</h1>", unsafe_allow_html=True)
-st.info("💡 Votre clé OpenAI est sécurisée via Streamlit Cloud (Secrets).")
+# =========================
+# (On affichera les titres après avoir défini la langue courante)
 
-# Par défaut, langue = FR (avant tout usage de LABELS)
+# =========================
+# ETAT INITIAL : Langue
+# =========================
 if "lang" not in st.session_state:
     st.session_state.lang = "FR"
 lang = st.session_state.lang
 
-# -----------------------
+# Titre + sous-titre traduits
+st.markdown(f"<h1 style='text-align: center; color: #ff69b4;'>{LABELS[lang]['title']}</h1>", unsafe_allow_html=True)
+st.caption(LABELS[lang]["subtitle"])
+st.info("💡 Votre clé OpenAI est sécurisée via Streamlit Cloud (Secrets).")
+
+# =========================
 # CARROUSEL IMAGES
-# -----------------------
+# =========================
 st.markdown("## 🎬 Inspirations")
 images = [
     {"file": "slide1.jpg", "caption": LABELS[lang]["tagline"]},
@@ -133,13 +183,14 @@ if "carousel_index" not in st.session_state:
     st.session_state.carousel_index = 0
 
 slider_val = st.slider(
-    "Sélectionne une image",
+    LABELS[lang]["carousel_prompt"],
     min_value=1, max_value=len(images),
     value=st.session_state.carousel_index + 1,
     key="carousel_slider"
 )
 st.session_state.carousel_index = slider_val - 1
 current = images[st.session_state.carousel_index]
+
 if os.path.exists(current["file"]):
     st.image(current["file"], use_container_width=True, caption=current["caption"])
 else:
@@ -155,41 +206,40 @@ with c3:
         st.session_state.carousel_index = (st.session_state.carousel_index + 1) % len(images)
         st.session_state.carousel_slider = st.session_state.carousel_index + 1
 
-# -----------------------
+# =========================
 # LANGUE & ACTIVITÉ
-# -----------------------
-st.markdown(f"### {LABELS[lang]['choose_activity']}")
+# =========================
+st.markdown(f"### {LABELS[lang]['choose_lang']}")
 
-# Choix langue
+# Choix de la langue
 lang_buttons = {"🇫🇷 FR": "FR", "🇬🇧 EN": "EN", "🇪🇸 ES": "ES", "🇩🇪 DE": "DE", "🇮🇹 IT": "IT"}
 cols = st.columns(len(lang_buttons))
 for i, (label, code) in enumerate(lang_buttons.items()):
     if cols[i].button(label):
         st.session_state.lang = code
-        st.rerun()
-lang = st.session_state.lang  # rafraîchi après clic
+        st.rerun()  # rafraîchir pour appliquer toutes les traductions
+lang = st.session_state.lang  # mise à jour
 
-# Choix activité (libellés traduits)
+# Choix de l’activité (libellés traduits)
 if "activity" not in st.session_state:
     st.session_state.activity = "Histoire"
 activity = st.session_state.activity
 
-cols = st.columns(5)
-ACTS = ["Histoire", "Saynette", "Poème", "Chanson", "Libre"]
-for i, act in enumerate(ACTS):
-    if cols[i].button(ACTIVITY_LABELS[lang][act]):
-        st.session_state.activity = act
-        activity = act
+act_cols = st.columns(5)
+for i, act_key in enumerate(["Histoire", "Saynette", "Poème", "Chanson", "Libre"]):
+    if act_cols[i].button(ACTIVITY_LABELS[lang][act_key]):
+        st.session_state.activity = act_key
+        activity = act_key
 
-# -----------------------
-# AUTEUR
-# -----------------------
+# =========================
+# CHAMP AUTEUR
+# =========================
 st.markdown(f"### {LABELS[lang]['author']}")
-author = st.text_input(LABELS[lang]['author_name'], "Ma classe")
+author = st.text_input(LABELS[lang]["author_name"], "Ma classe")
 
-# -----------------------
-# QPACK (questions/suggestions) – 5 activités × 5 langues
-# -----------------------
+# =========================
+# QPACK : questions/suggestions (5 langues x 5 activités)
+# =========================
 QPACK = {
     "FR": {
         "Histoire": [
@@ -338,11 +388,11 @@ QPACK = {
     },
 }
 
-# -----------------------
-# QUESTIONS + SUGGESTIONS (sécurisé)
-# -----------------------
+# =========================
+# AFFICHAGE QUESTIONS + SUGGESTIONS (fix stable)
+# =========================
 st.markdown(f"### {LABELS[lang]['answer']}")
-st.caption(LABELS[lang]['hint'])
+st.caption(LABELS[lang]["hint"])
 
 answers = []
 questions = QPACK.get(lang, QPACK["FR"]).get(activity, [])
@@ -352,33 +402,34 @@ for i, q in enumerate(questions, start=1):
     with st.container():
         st.markdown(f"<div class='card'><b>{i}. {q['q']}</b></div>", unsafe_allow_html=True)
 
-        # valeur par défaut
+        # Valeur par défaut dans l'état
         if f"q{i}" not in st.session_state:
             st.session_state[f"q{i}"] = ""
 
-        # champ lié à session_state
+        # Champ texte (lié à session_state)
         val = st.text_input("", key=f"q{i}")
 
-        # suggestions
+        # Suggestions : on modifie 'val' d'abord, puis on synchronise l'état
         sug_cols = st.columns(len(q["sug"]))
         for j, sug in enumerate(q["sug"]):
             if sug_cols[j].button(sug, key=f"sug{i}_{j}"):
-                st.session_state[f"q{i}"] = sug
                 val = sug
 
+        # Synchronisation en dehors du handler de bouton (évite StreamlitAPIException)
+        st.session_state[f"q{i}"] = val
         answers.append(val)
 
     progress.progress(int(i / max(1, len(questions)) * 100))
 
-# -----------------------
+# =========================
 # GÉNÉRATION + PDF
-# -----------------------
+# =========================
 if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary"):
     if not any(answers):
-        st.error("⚠️ Veuillez répondre à au moins une question.")
+        st.error(LABELS[lang]["need_answers"])
     else:
-        with st.spinner("✍️ L'IA écrit votre création..."):
-            # texte affiché de l'activité dans la langue choisie
+        with st.spinner(LABELS[lang]["writing"]):
+            # Nom d'activité affiché dans la langue choisie
             activity_display = ACTIVITY_LABELS[lang][activity]
 
             prompt = (
@@ -402,18 +453,19 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
                 )
                 story = resp.choices[0].message.content.strip()
 
-                st.success("✨ Voici votre création :")
+                st.success(LABELS[lang]["result_title"])
                 st.markdown(
                     f"<div style='background:#fff0f6; padding:15px; border-radius:10px;'>{story}</div>",
                     unsafe_allow_html=True
                 )
 
-                # PDF
+                # ------- Export PDF -------
                 def create_pdf(text):
                     tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
                     c = canvas.Canvas(tmp_file.name, pagesize=A4)
                     width, height = A4
 
+                    # Couverture
                     c.setFont("Helvetica-Bold", 22)
                     c.drawCentredString(width/2, height - 4*cm, "Atelier Créatif — EDU")
                     c.setFont("Helvetica", 16)
@@ -426,6 +478,7 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
                     c.setFont("Helvetica", 12)
                     y = height - 3*cm
                     for line in text.split("\n"):
+                        # wrap simplifié ~90 chars
                         for sub in [line[i:i+90] for i in range(0, len(line), 90)]:
                             c.drawString(2*cm, y, sub)
                             y -= 15
@@ -439,7 +492,7 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
                 pdf_path = create_pdf(story)
                 with open(pdf_path, "rb") as f:
                     st.download_button(
-                        label="⬇️ Télécharger en PDF",
+                        label=LABELS[lang]["pdf_dl"],
                         data=f,
                         file_name="atelier_creatif.pdf",
                         mime="application/pdf",
