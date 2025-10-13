@@ -74,12 +74,17 @@ st.markdown(
     }
 
     /* Bloc résultat */
-    .result-box {
-        background:#fff0f6;
-        padding:15px;
-        border-radius:10px;
-        border: 1px solid #ffd6e7;
-    }
+   .result-box {
+    background:#fff0f6;
+    padding:15px;
+    border-radius:10px;
+    border: 1px solid #ffd6e7;
+    color: #000000 !important;  /* Texte toujours noir */
+    font-size: 16px;
+    line-height: 1.4em;
+    white-space: pre-wrap; /* conserve les sauts de ligne */
+}
+
 /* Radios horizontaux stylés comme des chips */
 div[role="radiogroup"] {
     display: flex;
@@ -305,22 +310,36 @@ else:
 # ACTIVITÉ + LANGUE
 # =========================
 st.markdown(f"### {LABELS[lang]['choose_lang']}")
-lang_buttons = {"🇫🇷 FR": "FR", "🇬🇧 EN": "EN", "🇪🇸 ES": "ES", "🇩🇪 DE": "DE", "🇮🇹 IT": "IT"}
-cols = st.columns(len(lang_buttons))
-for i, (label, code) in enumerate(lang_buttons.items()):
-    if cols[i].button(label):
-        st.session_state.lang = code
-        st.rerun()
-lang = st.session_state.lang
+l# =========================
+# LANGUE
+# =========================
+lang = st.radio(
+    LABELS[lang]['choose_lang'],
+    options=["FR", "EN", "ES", "DE", "IT"],
+    format_func=lambda x: {
+        "FR": "🇫🇷 Français",
+        "EN": "🇬🇧 English",
+        "ES": "🇪🇸 Español",
+        "DE": "🇩🇪 Deutsch",
+        "IT": "🇮🇹 Italiano"
+    }[x],
+    horizontal=True,
+    index=["FR", "EN", "ES", "DE", "IT"].index(st.session_state.get("lang", "FR"))
+)
+st.session_state.lang = lang
 
-activities = ["Histoire", "Saynette", "Poème", "Chanson", "Libre"]
-cols = st.columns(len(activities))
-for i, act in enumerate(activities):
-    if cols[i].button(act):
-        st.session_state.activity = act
-if "activity" not in st.session_state:
-    st.session_state.activity = "Histoire"
-activity = st.session_state.activity
+
+# =========================
+# ACTIVITÉ
+# =========================
+activity = st.radio(
+    "🎭 Activité",
+    options=["Histoire", "Saynette", "Poème", "Chanson", "Libre"],
+    horizontal=True,
+    index=["Histoire", "Saynette", "Poème", "Chanson", "Libre"].index(st.session_state.get("activity", "Histoire"))
+)
+st.session_state.activity = activity
+
 
 # =========================
 # CHAMP AUTEUR
@@ -573,8 +592,12 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
                     story = resp.choices[0].message.content.strip()
 
                     # Affichage résultat
-                    st.success(LABELS[lang]["result_title"])
-                    st.markdown(f"<div class='result-box'>{story}</div>", unsafe_allow_html=True)
+                   st.success(LABELS[lang]["result_title"])
+st.markdown(
+    f"<div class='result-box'>{story}</div>",
+    unsafe_allow_html=True
+)
+
 
                     # Export PDF
                     def create_pdf(text: str) -> str:
