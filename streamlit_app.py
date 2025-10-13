@@ -477,7 +477,19 @@ for i, q in enumerate(questions, start=1):
     " ",
     key=key_text,
     label_visibility="collapsed",
-    placeholder="✍️ Saisissez votre idée ou cliquez sur une suggestion"
+   placeholders = {
+    "FR": "Votre idée ou une suggestion…",
+    "EN": "Your idea or a suggestion…",
+    "ES": "Tu idea o una sugerencia…",
+    "DE": "Deine Idee oder ein Vorschlag…",
+    "IT": "La tua idea o un suggerimento…",
+}
+
+val = st.text_input(
+    " ",
+    key=key_text,
+    label_visibility="collapsed",
+    placeholder=placeholders.get(lang, "Votre idée ou une suggestion…")
 )
 
     answers.append(val)
