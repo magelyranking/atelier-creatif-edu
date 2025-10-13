@@ -447,37 +447,6 @@ QPACK = {
     },
 }
 # =========================
-# AFFICHAGE QUESTIONS (corrigé, compact, lisible)
-# =========================
-st.markdown(f"### {LABELS[lang]['answer']}")
-st.caption(LABELS[lang]["hint"])
-
-answers = []
-questions = QPACK.get(lang, QPACK["FR"]).get(activity, [])
-progress = st.progress(0)
-
-for i, q in enumerate(questions, start=1):
-    # Question
-    st.markdown(
-        f"<div class='question-card'><b>{i}. {q['q']}</b></div>",
-        unsafe_allow_html=True
-    )
-
-    # Clé unique
-    key_text = f"answer_{activity}_{lang}_{i}"
-
-    # Suggestions en boutons côte à côte
-    cols = st.columns(len(q["sug"]))
-    for j, sug in enumerate(q["sug"]):
-        if cols[j].button(sug, key=f"btn_{activity}_{lang}_{i}_{j}"):
-            st.session_state[key_text] = sug
-
-    # Champ texte lié à la question
-    val = st.text_input(
-    " ",
-    key=key_text,
-    label_visibility="collapsed",
-# =========================
 # Placeholders multilingues
 # =========================
 placeholders = {
