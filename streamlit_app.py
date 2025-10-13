@@ -223,6 +223,22 @@ div[role="radiogroup"] label span {
 div[role="radiogroup"] > label[data-checked="true"] span {
     color: #ffffff !important;
 }
+/* Forcer visibilité du texte dans les suggestions (iPhone fix) */
+.suggestion-btn {
+    background: #ffffff !important;  /* fond blanc */
+    color: #000000 !important;       /* texte noir toujours visible */
+    border: 1px solid #91d5ff !important;
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    -webkit-text-fill-color: #000000 !important; /* iOS fix */
+}
+
+.suggestion-btn:hover {
+    background: #e6f7ff !important;
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+}
 
     </style>
     """,
