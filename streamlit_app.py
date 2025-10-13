@@ -409,15 +409,20 @@ for i, q in enumerate(questions, start=1):
         # Champ texte
         val = st.text_input("", key=f"q{i}")
 
-        # Boutons de suggestion
+        # Suggestions
         sug_cols = st.columns(len(q["sug"]))
         for j, sug in enumerate(q["sug"]):
-            if sug_cols[j].button(sug, key=f"sug{i}_{j}"):
-                # ⚡ mettre à jour directement la valeur dans session_state
-                st.session_state[f"q{i}"] = sug
-                val = sug
+            # On crée un bouton avec une clé indépendante
+            if sug_cols[j].button(sug, key=f"sugbtn_{i}_{j}"):
+                # On stocke dans une clé temporaire
+                st.session_state[f"selected_sug_{i}"] = sug
 
-        answers.append(val)  # la valeur finale est prise du champ ou du bouton
+        # Après les boutons : si une suggestion a été choisie, on l'applique
+        if f"selected_sug_{i}" in st.session_state:
+            st.session_state[f"q{i}"] = st.session_state[f"selected_sug_{i}"]
+            val = st.session_state[f"q{i}"]
+
+        answers.append(val)
 
     progress.progress(int(i / max(1, len(questions)) * 100))
 
