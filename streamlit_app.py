@@ -381,23 +381,27 @@ for i, q in enumerate(questions, start=1):
     with st.container():
         st.markdown(f"<div class='card'><b>{i}. {q['q']}</b></div>", unsafe_allow_html=True)
 
-        # Assurer un état initial
-        if f"q{i}" not in st.session_state:
-            st.session_state[f"q{i}"] = ""
+        # Clés stables
+        key_text = f"text_{i}"
+        key_sug = f"sug_{i}"
 
-        # Boutons de suggestions
+        # Initialisation
+        if key_text not in st.session_state:
+            st.session_state[key_text] = ""
+
+        # Suggestions
         sug_cols = st.columns(len(q["sug"]))
         for j, sug in enumerate(q["sug"]):
-            if sug_cols[j].button(sug, key=f"sugbtn_{i}_{j}"):
-                st.session_state[f"q{i}"] = sug   # clic = préremplissage
+            if sug_cols[j].button(sug, key=f"btn_{i}_{j}"):
+                st.session_state[key_text] = sug
+                st.rerun()  # relancer pour remplir la case
 
         # Champ texte lié à l'état
-        val = st.text_input("", value=st.session_state[f"q{i}"], key=f"text_{i}")
-        st.session_state[f"q{i}"] = val  # mise à jour si modifié manuellement
-
+        val = st.text_input("", value=st.session_state[key_text], key=key_text)
         answers.append(val)
 
     progress.progress(int(i / max(1, len(questions)) * 100))
+
 
 # =========================
 # GENERATION TEXTE + PDF
