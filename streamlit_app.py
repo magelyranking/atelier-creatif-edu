@@ -33,7 +33,7 @@ st.markdown(
 
     /* Style des cartes questions */
     .question-card {
-        background: #ffffff;
+        background: #ffffff !important;
         border-radius: 12px;
         padding: 10px 14px;
         margin: 6px 0 2px 0;
@@ -42,28 +42,31 @@ st.markdown(
         line-height: 1.4em;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        color: #000000 !important;
     }
 
-    /* Suggestions en chips flexibles */
-.suggestion-wrap {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin: 6px 0;
-}
-.suggestion-btn {
-    flex: none;
-    padding: 6px 14px;
-    border-radius: 20px;
-    background: #e6f7ff;
-    border: 1px solid #91d5ff;
-    cursor: pointer;
-    font-size: 14px;
-    line-height: 1.3em;
-}
-.suggestion-btn:hover {
-    background: #bae7ff;
-}
+    /* Suggestions en chips */
+    .suggestion-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 6px 0;
+    }
+    .suggestion-btn {
+        flex: none;
+        padding: 6px 14px;
+        border-radius: 20px;
+        background: #ffffff !important; /* fond blanc */
+        border: 1px solid #91d5ff !important;
+        cursor: pointer;
+        font-size: 14px;
+        line-height: 1.3em;
+        color: #000000 !important;      /* texte noir */
+    }
+    .suggestion-btn:hover {
+        background: #e6f7ff !important;
+        color: #000000 !important;
+    }
 
     /* Inputs plus grands (mobile friendly) */
     input, textarea {
@@ -71,103 +74,81 @@ st.markdown(
         font-size: 16px !important;
         padding: 10px !important;
         border-radius: 8px;
+        color: #000000 !important;
+        background-color: #ffffff !important;
+    }
+
+    /* Placeholder lisible */
+    input::placeholder {
+        color: #666 !important;
+        opacity: 1 !important;
+        font-size: 14px !important;
     }
 
     /* Bloc résultat */
-   .result-box {
-    background:#fff0f6;
-    padding:15px;
-    border-radius:10px;
-    border: 1px solid #ffd6e7;
-    color: #000000 !important;  /* Texte toujours noir */
-    font-size: 16px;
-    line-height: 1.4em;
-    white-space: pre-wrap; /* conserve les sauts de ligne */
-}
+    .result-box {
+        background:#fff0f6;
+        padding:15px;
+        border-radius:10px;
+        border: 1px solid #ffd6e7;
+        color: #000000 !important; /* texte toujours noir */
+        font-size: 16px;
+        line-height: 1.4em;
+        white-space: pre-wrap;
+    }
 
-/* Radios horizontaux stylés comme des chips */
-div[role="radiogroup"] {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 6px 0;
-}
+    /* Radios horizontaux stylés */
+    div[role="radiogroup"] {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 6px 0;
+    }
 
-div[role="radiogroup"] > label {
-    background: #e6f7ff;
-    border: 1px solid #91d5ff;
-    border-radius: 20px;
-    padding: 6px 14px;
-    cursor: pointer;
-    font-size: 14px;
-    line-height: 1.3em;
-    transition: background 0.2s, border 0.2s;
-}
+    /* Boutons radios (activités/langues) */
+    div[role="radiogroup"] > label {
+        background: #ffffff !important; /* fond blanc */
+        border: 1px solid #91d5ff !important;
+        border-radius: 20px;
+        padding: 6px 14px;
+        cursor: pointer;
+        font-size: 14px;
+        line-height: 1.3em;
+        color: #000000 !important; /* texte noir */
+        transition: background 0.2s, border 0.2s;
+    }
 
-/* Effet hover */
-div[role="radiogroup"] > label:hover {
-    background: #bae7ff;
-}
+    /* Effet hover */
+    div[role="radiogroup"] > label:hover {
+        background: #e6f7ff !important;
+    }
 
-/* Quand sélectionné */
-div[role="radiogroup"] > label[data-checked="true"] {
-    background: #1890ff;
-    color: white;
-    border: 1px solid #1890ff;
-}
- /* Forcer affichage du texte dans les radios Streamlit (mobile/iPhone fix) */
-div[role="radiogroup"] label span {
-    display: inline !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    font-size: 15px !important;
-    white-space: nowrap; /* garde les mots lisibles */
-}
- .question-card {
-    background: #ffffff;
-    border-radius: 10px;
-    padding: 6px 10px;
-    margin: 4px 0;
-    font-size: 15px;
-    word-wrap: break-word;
-}
-/* Forcer couleur du texte dans les questions */
-.question-card {
-    color: #000000 !important;
-    font-size: 15px !important;
-}
+    /* Quand sélectionné */
+    div[role="radiogroup"] > label[data-checked="true"] {
+        background: #1890ff !important;
+        color: #ffffff !important; /* texte blanc sur bleu */
+        border: 1px solid #1890ff !important;
+    }
 
-/* Forcer couleur et visibilité du texte dans les champs input */
-input[type="text"] {
-    color: #000000 !important;
-    background-color: #ffffff !important;
-    font-size: 15px !important;
-}
-/* Corrige l'affichage du placeholder sur iPhone/iPad */
-input::placeholder {
-    color: #666 !important;   /* gris bien visible */
-    opacity: 1 !important;    /* force l'affichage (Safari met parfois à 0.4) */
-    font-size: 14px !important;
-}
-/* Force un thème clair même si iPhone est en mode sombre */
-html, body, .main, .block-container {
-    background-color: #f9f9f9 !important;
-    color: #000000 !important;
-}
+    /* Forcer affichage du texte dans les radios Streamlit */
+    div[role="radiogroup"] label span {
+        display: inline !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-size: 15px !important;
+        white-space: nowrap;
+    }
 
-.result-box {
-    background: #fff0f6 !important;
-    color: #000000 !important;
-}
-
-.question-card {
-    background: #ffffff !important;
-    color: #000000 !important;
-}
+    /* Force un thème clair sur iPhone/iPad même en mode sombre */
+    html, body, .main, .block-container {
+        background-color: #f9f9f9 !important;
+        color: #000000 !important;
+    }
     </style>
     """,
     unsafe_allow_html=True
 )
+
 
 # =========================
 # OPENAI
