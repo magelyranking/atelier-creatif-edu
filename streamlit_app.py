@@ -477,7 +477,8 @@ for i, q in enumerate(questions, start=1):
     " ",
     key=key_text,
     label_visibility="collapsed",
-  placeholders = {
+ # Placeholders multilingues
+placeholders = {
     "FR": "Votre idée ou une suggestion…",
     "EN": "Your idea or a suggestion…",
     "ES": "Tu idea o una sugerencia…",
@@ -485,21 +486,27 @@ for i, q in enumerate(questions, start=1):
     "IT": "La tua idea o un suggerimento…",
 }
 
+answers = []
+questions = QPACK.get(lang, QPACK["FR"]).get(activity, [])
+progress = st.progress(0)
+
 for i, q in enumerate(questions, start=1):
+    # Afficher la question
     st.markdown(
         f"<div class='question-card'><b>{i}. {q['q']}</b></div>",
         unsafe_allow_html=True
     )
 
+    # Clé unique
     key_text = f"answer_{activity}_{lang}_{i}"
 
-    # Suggestions en boutons
+    # Suggestions sous forme de boutons côte à côte
     cols = st.columns(len(q["sug"]))
     for j, sug in enumerate(q["sug"]):
         if cols[j].button(sug, key=f"btn_{activity}_{lang}_{i}_{j}"):
             st.session_state[key_text] = sug
 
-    # Champ avec placeholder multilingue
+    # Champ texte avec placeholder multilingue
     val = st.text_input(
         " ",
         key=key_text,
@@ -508,8 +515,8 @@ for i, q in enumerate(questions, start=1):
     )
     answers.append(val)
 
+    # Progression
     progress.progress(int(i / max(1, len(questions)) * 100))
-
 
 
 # Petit indicateur d’essais restants
