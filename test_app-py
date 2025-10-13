@@ -1,0 +1,35 @@
+import streamlit as st
+import openai
+import os
+
+st.set_page_config(page_title="Test OpenAI", page_icon="⚡")
+
+st.title("⚡ Test OpenAI minimal")
+
+# --- clé API
+api_key = os.environ.get("OPENAI_API_KEY")
+if not api_key:
+    st.error("⚠️ Aucune clé API trouvée. Ajoutez OPENAI_API_KEY dans les Secrets Streamlit Cloud.")
+    st.stop()
+openai.api_key = api_key
+
+# --- simple champ de texte
+question = st.text_input("Écris ton idée :", "Chat qui parle")
+
+if st.button("🪄 Générer un texte"):
+    with st.spinner("L'IA écrit..."):
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": "Tu es un assistant créatif pour enfants."},
+                    {"role": "user", "content": f"Crée une petite histoire pour enfants avec : {question}"}
+                ],
+                temperature=0.8,
+                max_tokens=300
+            )
+            story = response["choices"][0]["message"]["content"].strip()
+            st.success("✨ Résultat")
+            st.write(story)
+        except Exception as e:
+            st.error(f"Erreur : {e}")
