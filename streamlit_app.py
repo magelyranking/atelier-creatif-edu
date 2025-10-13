@@ -163,6 +163,11 @@ with c3:
 # -----------------------
 # LANGUE & ACTIVITÉ
 # -----------------------
+# Sécurisation de la langue
+if "lang" not in st.session_state:
+    st.session_state.lang = "FR"
+lang = st.session_state.lang
+
 st.markdown(f"### {LABELS[lang]['choose_activity']}")
 
 
