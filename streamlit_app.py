@@ -211,3 +211,4 @@ if st.button("🪄 Générer le texte", use_container_width=True, type="primary"
             prompt = f"Langue : {lang}. Activité : {activity}. "
             prompt += "Crée un texte adapté aux enfants (6–14 ans). Style positif et créatif.\n"
             prompt += f"Auteur : {author}\n"
+Correction streamlit_app.py avec génération texte + PDF
