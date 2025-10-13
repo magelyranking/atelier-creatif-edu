@@ -419,7 +419,7 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
                         prompt += f"Q{i}: {a}\n"
 
                 try:
-                   resp = client.chat.completions.create(
+                 resp = client.chat.completions.create(
     model="gpt-4o-mini",
     messages=[
         {"role": "system", "content": "Tu es un assistant créatif pour enfants."},
@@ -429,15 +429,11 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
     max_tokens=500,
 )
 
-# 👇 corriger la lecture
-# Récupération du texte de l’IA
-# Récupération du texte de l’IA
+# 🔎 Récupération du texte de l’IA (bloc complet)
 try:
     story = resp.choices[0].message.content.strip()
 except Exception:
-    # fallback si la réponse est structurée différemment
     story = resp.choices[0].message["content"].strip()
-
 
                     st.success(LABELS[lang]["result_title"])
                     st.markdown(
