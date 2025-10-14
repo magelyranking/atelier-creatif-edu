@@ -640,15 +640,15 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
                     prompt += "Tu dois créer un texte adapté aux enfants (6–14 ans). "
                     prompt += "Le texte doit être positif, créatif, structuré et bienveillant.\n\n"
 
-                    # Consignes spécifiques par activité
-                    if activity == "Poème":
-                        prompt += (
-                            "Consignes pour le poème :\n"
-                            "- Respecter le style choisi (alexandrin, haïku, rimes libres, etc.)\n"
-                            "- Longueur : 2 à 6 strophes.\n"
-                            "- Ton adapté aux enfants.\n\n"
-                        )
-                   elif activity == "Chanson":
+                  # Consignes spécifiques par activité
+if activity == "Poème":
+    prompt += (
+        "Consignes pour le poème :\n"
+        "- Respecter le style choisi (alexandrin, haïku, rimes libres, etc.)\n"
+        "- Longueur : 2 à 4 strophes.\n"
+        "- Ton adapté aux enfants.\n\n"
+    )
+elif activity == "Chanson":
     prompt += (
         "Consignes pour la chanson :\n"
         "- Respecter le style musical choisi (pop, jazz, rap, folk...)\n"
@@ -656,7 +656,6 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
         "- Ambiance adaptée aux enfants.\n"
         "- Fournir aussi une suggestion musicale simple (ex : accords C-G-Am-F, rythme 4/4, tempo modéré).\n\n"
     )
-
 elif activity == "Saynette":
     prompt += (
         "Consignes pour la saynette :\n"
@@ -665,20 +664,20 @@ elif activity == "Saynette":
         "- De 6 à 12 répliques.\n"
         "- Si c’est une comédie musicale, ajouter aussi une indication de rythme ou de style musical (ex : jazz, pop, folk, tempo rapide ou lent).\n\n"
     )
+elif activity == "Histoire":
+    prompt += (
+        "Consignes pour l’histoire :\n"
+        "- Structure claire : début, problème, solution, fin.\n"
+        "- Ton choisi par l’utilisateur (drôle, mystérieux, épique...)\n"
+        "- Fin souhaitée (heureuse, morale, surprenante...)\n\n"
+    )
+elif activity == "Libre":
+    prompt += (
+        "Consignes pour le texte libre :\n"
+        "- Respecter le type choisi (lettre, dialogue, journal...)\n"
+        "- Ton narratif choisi (réaliste, imaginaire, poétique...)\n\n"
+    )
 
-                    elif activity == "Histoire":
-                        prompt += (
-                            "Consignes pour l’histoire :\n"
-                            "- Structure claire : début, problème, solution, fin.\n"
-                            "- Ton choisi par l’utilisateur (drôle, mystérieux, épique...)\n"
-                            "- Fin souhaitée (heureuse, morale, surprenante...)\n\n"
-                        )
-                    elif activity == "Libre":
-                        prompt += (
-                            "Consignes pour le texte libre :\n"
-                            "- Respecter le type choisi (lettre, dialogue, journal...)\n"
-                            "- Ton narratif choisi (réaliste, imaginaire, poétique...)\n\n"
-                        )
 
                     # Intégrer toutes les réponses utilisateur
                     prompt += "Voici les réponses données par l’utilisateur :\n"
