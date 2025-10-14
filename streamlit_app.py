@@ -194,6 +194,8 @@ LABELS = {
     "identify": "👤 Identificazione (Nome o Email)"
 }
 
+}
+
 # =========================
 # ETAT INITIAL
 # =========================
