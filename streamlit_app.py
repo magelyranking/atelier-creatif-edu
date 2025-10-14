@@ -295,15 +295,22 @@ lang = st.radio(
 st.session_state.lang = lang
 lang = st.session_state.lang
 
-# Sélecteur d’activité
+# =========================
+# ACTIVITÉS traduites
+# =========================
 activities = ["Histoire", "Saynette", "Poème", "Chanson", "Libre"]
+
 cols = st.columns(len(activities))
 for i, act in enumerate(activities):
-    if cols[i].button(act):
+    label = LABELS[lang]["activities"][act]  # traduction
+    if cols[i].button(label, key=f"act_{act}"):
         st.session_state.activity = act
+
 if "activity" not in st.session_state:
     st.session_state.activity = "Histoire"
+
 activity = st.session_state.activity
+
 
 # =========================
 # CHAMP AUTEUR
