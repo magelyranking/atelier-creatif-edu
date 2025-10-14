@@ -243,23 +243,25 @@ st.image(current["file"], use_container_width=True, caption=current["caption"])
 # LANGUE + ACTIVITÉ
 # =========================
 st.markdown(f"### {LABELS[lang]['choose_lang']}")
-# Sélecteur de langue (recommandé)
+
+# Sélecteur de langue (radio avec 5 options)
 lang = st.radio(
-    LABELS[st.session_state.get("lang","FR")]['choose_lang'],
-    options=["FR","EN","ES","DE","IT"],
-    format_func=lambda x: {"FR":"🇫🇷 Français","EN":"🇬🇧 English","ES":"🇪🇸 Español","DE":"🇩🇪 Deutsch","IT":"🇮🇹 Italiano"}[x],
+    LABELS[st.session_state.get("lang", "FR")]['choose_lang'],
+    options=["FR", "EN", "ES", "DE", "IT"],
+    format_func=lambda x: {
+        "FR": "🇫🇷 Français",
+        "EN": "🇬🇧 English",
+        "ES": "🇪🇸 Español",
+        "DE": "🇩🇪 Deutsch",
+        "IT": "🇮🇹 Italiano"
+    }[x],
     horizontal=True,
-    index=["FR","EN","ES","DE","IT"].index(st.session_state.get("lang","FR"))
+    index=["FR", "EN", "ES", "DE", "IT"].index(st.session_state.get("lang", "FR"))
 )
 st.session_state.lang = lang
 lang = st.session_state.lang
-cols = st.columns(len(lang_buttons))
-for i, (label, code) in enumerate(lang_buttons.items()):
-    if cols[i].button(label):
-        st.session_state.lang = code
-        st.rerun()
-lang = st.session_state.lang
 
+# Sélecteur d’activité
 activities = ["Histoire", "Saynette", "Poème", "Chanson", "Libre"]
 cols = st.columns(len(activities))
 for i, act in enumerate(activities):
