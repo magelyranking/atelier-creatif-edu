@@ -130,7 +130,68 @@ LABELS = {
         "default_author": "My class",
         "identify": "👤 Identification (Name or Email)"
     },
-    # ES, DE, IT à compléter…
+  "ES": {
+    "title": "🎨 Taller Creativo — EDU",
+    "subtitle": "Crea fácilmente historias, poemas, canciones o escenitas para alumnos (6–14). Responde las preguntas ➝ descarga en PDF ✨",
+    "choose_lang": "🌍 Elige el idioma y la actividad",
+    "author": "✍️ Autor",
+    "author_name": "Nombre del autor:",
+    "answer": "📝 Responde a las preguntas",
+    "hint": "💡 Usa las sugerencias haciendo clic o añade tu propia idea.",
+    "generate": "🪄 Generar texto",
+    "pdf_dl": "⬇️ Descargar en PDF",
+    "carousel_prompt": "Selecciona una imagen",
+    "tagline": "✨ Crea una historia mágica con tus alumnos",
+    "result_title": "✨ Aquí está tu creación:",
+    "need_answers": "⚠️ Responde al menos a una pregunta.",
+    "writing": "⏳ Espere, su obra está en construcción...",
+    "tries_left": "Te quedan {n} de 5 intentos.",
+    "secure_api": "💡 Tu clave OpenAI está segura en Streamlit Cloud (Secrets).",
+    "inspirations": "🎬 Inspiraciones",
+    "default_author": "Mi clase",
+    "identify": "👤 Identificación (Nombre o correo)"
+},
+"DE": {
+    "title": "🎨 Kreativwerkstatt — EDU",
+    "subtitle": "Erstelle leicht Geschichten, Gedichte, Lieder oder Sketche für Schüler (6–14). Beantworte die Fragen ➝ als PDF herunterladen ✨",
+    "choose_lang": "🌍 Wähle die Sprache und Aktivität",
+    "author": "✍️ Autor",
+    "author_name": "Name des Autors:",
+    "answer": "📝 Beantworte die Fragen",
+    "hint": "💡 Nutze die Vorschläge per Klick oder füge deine eigene Idee hinzu.",
+    "generate": "🪄 Text generieren",
+    "pdf_dl": "⬇️ Als PDF herunterladen",
+    "carousel_prompt": "Wähle ein Bild",
+    "tagline": "✨ Erstelle eine magische Geschichte mit deinen Schülern",
+    "result_title": "✨ Hier ist deine Erstellung:",
+    "need_answers": "⚠️ Bitte beantworte mindestens eine Frage.",
+    "writing": "⏳ Bitte warten, dein Werk wird erstellt...",
+    "tries_left": "Du hast noch {n} von 5 Versuchen.",
+    "secure_api": "💡 Dein OpenAI-Schlüssel ist in Streamlit Cloud (Secrets) gesichert.",
+    "inspirations": "🎬 Inspirationen",
+    "default_author": "Meine Klasse",
+    "identify": "👤 Identifikation (Name oder E-Mail)"
+},
+"IT": {
+    "title": "🎨 Laboratorio Creativo — EDU",
+    "subtitle": "Crea facilmente storie, poesie, canzoni o scenette per studenti (6–14). Rispondi alle domande ➝ scarica in PDF ✨",
+    "choose_lang": "🌍 Scegli la lingua e l’attività",
+    "author": "✍️ Autore",
+    "author_name": "Nome dell’autore:",
+    "answer": "📝 Rispondi alle domande",
+    "hint": "💡 Usa i suggerimenti con un clic oppure aggiungi la tua idea.",
+    "generate": "🪄 Genera il testo",
+    "pdf_dl": "⬇️ Scarica in PDF",
+    "carousel_prompt": "Seleziona un’immagine",
+    "tagline": "✨ Crea una storia magica con i tuoi studenti",
+    "result_title": "✨ Ecco la tua creazione:",
+    "need_answers": "⚠️ Rispondi ad almeno una domanda.",
+    "writing": "⏳ Attendere, la tua opera è in costruzione...",
+    "tries_left": "Ti restano {n} tentativi su 5.",
+    "secure_api": "💡 La tua chiave OpenAI è protetta in Streamlit Cloud (Secrets).",
+    "inspirations": "🎬 Ispirazioni",
+    "default_author": "La mia classe",
+    "identify": "👤 Identificazione (Nome o Email)"
 }
 
 # =========================
@@ -180,7 +241,16 @@ st.image(current["file"], use_container_width=True, caption=current["caption"])
 # LANGUE + ACTIVITÉ
 # =========================
 st.markdown(f"### {LABELS[lang]['choose_lang']}")
-lang_buttons = {"🇫🇷 FR": "FR", "🇬🇧 EN": "EN"}
+# Sélecteur de langue (recommandé)
+lang = st.radio(
+    LABELS[st.session_state.get("lang","FR")]['choose_lang'],
+    options=["FR","EN","ES","DE","IT"],
+    format_func=lambda x: {"FR":"🇫🇷 Français","EN":"🇬🇧 English","ES":"🇪🇸 Español","DE":"🇩🇪 Deutsch","IT":"🇮🇹 Italiano"}[x],
+    horizontal=True,
+    index=["FR","EN","ES","DE","IT"].index(st.session_state.get("lang","FR"))
+)
+st.session_state.lang = lang
+lang = st.session_state.lang
 cols = st.columns(len(lang_buttons))
 for i, (label, code) in enumerate(lang_buttons.items()):
     if cols[i].button(label):
