@@ -256,7 +256,7 @@ if f"essais_{user_id}" not in st.session_state:
     st.session_state[f"essais_{user_id}"] = 0
 
 # Fonction log
-ddef log_usage(user_id: str, lang: str, activity: str, essais: int):
+def log_usage(user_id: str, lang: str, activity: str, essais: int):
     """Log l'utilisation dans logs.csv (crée le fichier si besoin)."""
     log_file = Path("logs.csv")
     file_exists = log_file.exists()
@@ -277,7 +277,6 @@ ddef log_usage(user_id: str, lang: str, activity: str, essais: int):
             activity,
             essais
         ])
-
 
 # =========================
 # INSPIRATIONS (CARROUSEL)
