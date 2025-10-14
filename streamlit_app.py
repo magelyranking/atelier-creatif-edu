@@ -639,35 +639,31 @@ if admin_code == os.environ.get("ADMIN_CODE", "1234"):
             )
 
         # Lecture des logs
-        df = pd.read_csv(log_file)
+    # Lecture des logs
+df = pd.read_csv(log_file)
 
-        st.sidebar.markdown("### 📊 Statistiques")
+st.sidebar.markdown("### 📊 Statistiques")
 
-        # Nombre total d’essais
-        total_essais = len(df)
-        st.sidebar.metric("Nombre total d’essais", total_essais)
+# Nombre total d’essais
+total_essais = len(df)
+st.sidebar.metric("Nombre total d’essais", total_essais)
 
-        # Essais par utilisateur
-        essais_user = df.groupby("user_id")["essais"].max().reset_index()
-        essais_user = essais_user.rename(columns={"essais": "Nb essais"})
-        st.sidebar.markdown("👤 Par utilisateur")
-        st.sidebar.dataframe(essais_user, use_container_width=True, height=200)
-        log_usage(user_id, lang, activity, st.session_state["essais"])
+# Vérifier les colonnes avant d'afficher
+if "user_id" in df.columns and "essais" in df.columns:
+    essais_user = df.groupby("user_id")["essais"].max().reset_index()
+    essais_user = essais_user.rename(columns={"essais": "Nb essais"})
+    st.sidebar.markdown("👤 Par utilisateur")
+    st.sidebar.dataframe(essais_user, use_container_width=True, height=200)
 
-        # Essais par langue
-        essais_lang = df["lang"].value_counts().reset_index()
-        essais_lang.columns = ["Langue", "Nb essais"]
-        st.sidebar.markdown("🌍 Par langue")
-        st.sidebar.dataframe(essais_lang, use_container_width=True, height=200)
+if "lang" in df.columns:
+    essais_lang = df["lang"].value_counts().reset_index()
+    essais_lang.columns = ["Langue", "Nb essais"]
+    st.sidebar.markdown("🌍 Par langue")
+    st.sidebar.dataframe(essais_lang, use_container_width=True, height=200)
 
-        # Essais par activité
-        essais_act = df["activity"].value_counts().reset_index()
-        essais_act.columns = ["Activité", "Nb essais"]
-        st.sidebar.markdown("🎭 Par activité")
-        st.sidebar.dataframe(essais_act, use_container_width=True, height=200)
+if "activity" in df.columns:
+    essais_act = df["activity"].value_counts().reset_index()
+    essais_act.columns = ["Activité", "Nb essais"]
+    st.sidebar.markdown("🎭 Par activité")
+    st.sidebar.dataframe(essais_act, use_container_width=True, height=200)
 
-    else:
-        st.sidebar.info("📂 Aucun log enregistré pour l’instant.")
-else:
-    if admin_code:  # seulement si quelqu’un tape un code faux
-        st.sidebar.error("❌ Code incorrect")
