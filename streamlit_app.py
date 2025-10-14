@@ -6,6 +6,7 @@ from reportlab.lib.units import cm
 import tempfile
 from datetime import datetime
 import os, csv
+import pandas as pd
 
 # =========================
 # CONFIG APP
@@ -601,14 +602,16 @@ st.sidebar.markdown("### 🔒 Accès administrateur")
 # Champ mot de passe admin
 admin_code = st.sidebar.text_input("Code admin :", type="password")
 
-# Vérification : soit via un secret Streamlit, soit fallback "1234"
+# Vérification : ADMIN_CODE depuis secrets ou fallback
 if admin_code == os.environ.get("ADMIN_CODE", "1234"):
     st.sidebar.success("✅ Accès admin activé")
 
     from pathlib import Path
+    log_file = Path("logs.csv")
 
-    if Path("logs.csv").exists():
-        with open("logs.csv", "rb") as f:
+    if log_file.exists():
+        # Téléchargement du CSV
+        with open(log_file, "rb") as f:
             st.sidebar.download_button(
                 label="⬇️ Télécharger les logs (CSV)",
                 data=f,
@@ -616,6 +619,34 @@ if admin_code == os.environ.get("ADMIN_CODE", "1234"):
                 mime="text/csv",
                 use_container_width=True
             )
+
+        # Lecture et affichage stats
+        df = pd.read_csv(log_file)
+
+        st.markdown("## 📊 Statistiques d’utilisation")
+
+        # Nombre total d’essais
+        total_essais = len(df)
+        st.metric("Nombre total d’essais", total_essais)
+
+        # Essais par utilisateur
+        essais_user = df.groupby("user_id")["essais"].max().reset_index()
+        essais_user = essais_user.rename(columns={"essais": "Nb essais"})
+        st.markdown("### 👤 Essais par utilisateur")
+        st.dataframe(essais_user, use_container_width=True)
+
+        # Essais par langue
+        essais_lang = df["lang"].value_counts().reset_index()
+        essais_lang.columns = ["Langue", "Nb essais"]
+        st.markdown("### 🌍 Essais par langue")
+        st.dataframe(essais_lang, use_container_width=True)
+
+        # Essais par activité
+        essais_act = df["activity"].value_counts().reset_index()
+        essais_act.columns = ["Activité", "Nb essais"]
+        st.markdown("### 🎭 Essais par activité")
+        st.dataframe(essais_act, use_container_width=True)
+
     else:
         st.sidebar.info("📂 Aucun log enregistré pour l’instant.")
 else:
