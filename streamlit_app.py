@@ -592,3 +592,32 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
                         )
                 except Exception as e:
                     st.error(f"❌ Erreur OpenAI : {e}")
+# =========================
+# SECTION ADMIN (Accès protégé)
+# =========================
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 🔒 Accès administrateur")
+
+# Champ mot de passe admin
+admin_code = st.sidebar.text_input("Code admin :", type="password")
+
+# Vérification : soit via un secret Streamlit, soit fallback "1234"
+if admin_code == os.environ.get("ADMIN_CODE", "1234"):
+    st.sidebar.success("✅ Accès admin activé")
+
+    from pathlib import Path
+
+    if Path("logs.csv").exists():
+        with open("logs.csv", "rb") as f:
+            st.sidebar.download_button(
+                label="⬇️ Télécharger les logs (CSV)",
+                data=f,
+                file_name="logs.csv",
+                mime="text/csv",
+                use_container_width=True
+            )
+    else:
+        st.sidebar.info("📂 Aucun log enregistré pour l’instant.")
+else:
+    if admin_code:  # seulement si quelqu’un tape un code faux
+        st.sidebar.error("❌ Code incorrect")
