@@ -5,7 +5,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
 import tempfile
 from datetime import datetime
-import os
+import os, csv
 
 # =========================
 # CONFIG APP
@@ -18,236 +18,62 @@ st.set_page_config(
 )
 
 # =========================
-# CSS GLOBAL (UX améliorée)
+# CSS GLOBAL
 # =========================
 st.markdown(
     """
     <style>
-    /* Centrer le contenu et limiter la largeur */
     .main .block-container {
         max-width: 880px;
         padding-left: 1rem;
         padding-right: 1rem;
         margin: auto;
     }
-
-    /* Style des cartes questions */
     .question-card {
-        background: #ffffff !important;
+        background: #ffffff;
         border-radius: 12px;
         padding: 10px 14px;
         margin: 6px 0 2px 0;
         box-shadow: 0 1px 4px rgba(0,0,0,0.08);
         font-size: 16px;
         line-height: 1.4em;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        color: #000000 !important;
-    }
-
-    /* Suggestions en chips */
-    .suggestion-wrap {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin: 6px 0;
     }
     .suggestion-btn {
-        flex: none;
-        padding: 6px 14px;
-        border-radius: 20px;
-        background: #ffffff !important; /* fond blanc */
+        background: #ffffff !important;
+        color: #000000 !important;
         border: 1px solid #91d5ff !important;
-        cursor: pointer;
+        border-radius: 20px;
+        padding: 6px 14px;
         font-size: 14px;
-        line-height: 1.3em;
-        color: #000000 !important;      /* texte noir */
     }
     .suggestion-btn:hover {
         background: #e6f7ff !important;
         color: #000000 !important;
     }
-
-    /* Inputs plus grands (mobile friendly) */
-    input, textarea {
-        width: 100% !important;
-        font-size: 16px !important;
-        padding: 10px !important;
-        border-radius: 8px;
-        color: #000000 !important;
-        background-color: #ffffff !important;
-    }
-
-    /* Placeholder lisible */
-    input::placeholder {
-        color: #666 !important;
-        opacity: 1 !important;
-        font-size: 14px !important;
-    }
-
-    /* Bloc résultat */
-    .result-box {
-        background:#fff0f6;
-        padding:15px;
-        border-radius:10px;
-        border: 1px solid #ffd6e7;
-        color: #000000 !important; /* texte toujours noir */
-        font-size: 16px;
-        line-height: 1.4em;
-        white-space: pre-wrap;
-    }
-
-    /* Radios horizontaux stylés */
-    div[role="radiogroup"] {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin: 6px 0;
-    }
-
-    /* Boutons radios (activités/langues) */
     div[role="radiogroup"] > label {
-        background: #ffffff !important; /* fond blanc */
+        background: #ffffff !important;
+        color: #000000 !important;
         border: 1px solid #91d5ff !important;
         border-radius: 20px;
         padding: 6px 14px;
-        cursor: pointer;
-        font-size: 14px;
-        line-height: 1.3em;
-        color: #000000 !important; /* texte noir */
-        transition: background 0.2s, border 0.2s;
     }
-
-    /* Effet hover */
-    div[role="radiogroup"] > label:hover {
-        background: #e6f7ff !important;
-    }
-
-    /* Quand sélectionné */
     div[role="radiogroup"] > label[data-checked="true"] {
         background: #1890ff !important;
-        color: #ffffff !important; /* texte blanc sur bleu */
+        color: #ffffff !important;
         border: 1px solid #1890ff !important;
     }
-
-    /* Forcer affichage du texte dans les radios Streamlit */
-    div[role="radiogroup"] label span {
-        display: inline !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        font-size: 15px !important;
-        white-space: nowrap;
-    }
-
-    /* Force un thème clair sur iPhone/iPad même en mode sombre */
-    html, body, .main, .block-container {
-        background-color: #f9f9f9 !important;
+    input[type="text"] {
         color: #000000 !important;
+        background-color: #ffffff !important;
     }
-    /* === Fix iPhone / iPad dark mode pour Suggestions et Radios === */
-
-/* Suggestions (chips) */
-.suggestion-btn {
-    background: #ffffff !important;   /* fond blanc */
-    color: #000000 !important;        /* texte noir */
-    border: 1px solid #91d5ff !important;
-    display: inline-block !important; /* forcer affichage */
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-.suggestion-btn:hover {
-    background: #e6f7ff !important;
-    color: #000000 !important;
-}
-
-/* Radios (activités/langues) */
-div[role="radiogroup"] > label {
-    background: #ffffff !important;   /* fond blanc */
-    border: 1px solid #91d5ff !important;
-    color: #000000 !important;        /* texte noir */
-    display: inline-flex !important;  /* forcer le texte à s'afficher */
-    align-items: center !important;
-    justify-content: center !important;
-}
-div[role="radiogroup"] > label[data-checked="true"] {
-    background: #1890ff !important;   /* bleu sélection */
-    color: #ffffff !important;        /* texte blanc lisible */
-}
-
-/* Forcer affichage du texte dans les radios */
-div[role="radiogroup"] label span {
-    display: inline !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    color: #000000 !important;        /* texte noir par défaut */
-    font-size: 15px !important;
-}
-
-/* Quand sélectionné, texte devient blanc */
-div[role="radiogroup"] > label[data-checked="true"] span {
-    color: #ffffff !important;
-}
-/* Désactiver le mode sombre automatique de Safari iOS */
-html, body {
-    color-scheme: only light !important;
-    -webkit-appearance: none !important;
-    background-color: #ffffff !important;
-    color: #000000 !important;
-}
-
-/* Suggestions (toujours lisibles) */
-.suggestion-btn {
-    background: #ffffff !important;     /* fond blanc */
-    color: #000000 !important;          /* texte noir */
-    border: 1px solid #91d5ff !important;
-    -webkit-text-fill-color: #000000 !important; /* iOS force texte noir */
-}
-.suggestion-btn:hover {
-    background: #e6f7ff !important;
-    color: #000000 !important;
-    -webkit-text-fill-color: #000000 !important;
-}
-
-/* Boutons radio (langues + activités) */
-div[role="radiogroup"] > label {
-    background: #ffffff !important;
-    color: #000000 !important;
-    border: 1px solid #91d5ff !important;
-    border-radius: 20px;
-    padding: 6px 14px;
-    cursor: pointer;
-    font-size: 14px;
-    line-height: 1.3em;
-    -webkit-text-fill-color: #000000 !important;
-}
-
-/* Quand sélectionné */
-div[role="radiogroup"] > label[data-checked="true"] {
-    background: #1890ff !important;
-    color: #ffffff !important;
-    border: 1px solid #1890ff !important;
-    -webkit-text-fill-color: #ffffff !important;
-}
-/* Forcer affichage texte suggestions (Safari iOS) */
-button[kind="secondary"] {
-    background: #ffffff !important;
-    color: #000000 !important;
-    -webkit-text-fill-color: #000000 !important;
-    border: 1px solid #91d5ff !important;
-    font-size: 14px !important;
-}
-
-button[kind="secondary"]:hover {
-    background: #e6f7ff !important;
-    color: #000000 !important;
-    -webkit-text-fill-color: #000000 !important;
-}
-
+    input::placeholder {
+        color: #666 !important;
+        opacity: 1 !important;
+    }
     </style>
     """,
     unsafe_allow_html=True
 )
-
 
 # =========================
 # OPENAI
@@ -259,7 +85,7 @@ if not api_key:
 client = OpenAI(api_key=api_key)
 
 # =========================
-# LABELS UI (TRADUCTIONS)
+# LABELS UI
 # =========================
 LABELS = {
     "FR": {
@@ -277,7 +103,11 @@ LABELS = {
         "result_title": "✨ Voici votre création :",
         "need_answers": "⚠️ Veuillez répondre à au moins une question.",
         "writing": "⏳ Veuillez patienter, votre œuvre est en construction...",
-        "tries_left": "Il vous reste {n} essai(s) sur 5."
+        "tries_left": "Il vous reste {n} essai(s) sur 5.",
+        "secure_api": "💡 Votre clé OpenAI est sécurisée via Streamlit Cloud (Secrets).",
+        "inspirations": "🎬 Inspirations",
+        "default_author": "Ma classe",
+        "identify": "👤 Identification (Nom ou Email)"
     },
     "EN": {
         "title": "🎨 Creative Workshop — EDU",
@@ -294,59 +124,13 @@ LABELS = {
         "result_title": "✨ Here is your creation:",
         "need_answers": "⚠️ Please answer at least one question.",
         "writing": "⏳ Please wait, your creation is being written...",
-        "tries_left": "You have {n} of 5 tries left."
+        "tries_left": "You have {n} of 5 tries left.",
+        "secure_api": "💡 Your OpenAI key is secured via Streamlit Cloud (Secrets).",
+        "inspirations": "🎬 Inspirations",
+        "default_author": "My class",
+        "identify": "👤 Identification (Name or Email)"
     },
-    "ES": {
-        "title": "🎨 Taller Creativo — EDU",
-        "subtitle": "Crea fácilmente historias, poemas, canciones o escenitas para alumnos (6–14). Responde las preguntas ➝ descarga en PDF ✨",
-        "choose_lang": "🌍 Elige el idioma y la actividad",
-        "author": "✍️ Autor",
-        "author_name": "Nombre del autor:",
-        "answer": "📝 Responde a las preguntas",
-        "hint": "💡 Usa las sugerencias haciendo clic o añade tu propia idea.",
-        "generate": "🪄 Generar texto",
-        "pdf_dl": "⬇️ Descargar en PDF",
-        "carousel_prompt": "Selecciona una imagen",
-        "tagline": "✨ Crea una historia mágica con tus alumnos",
-        "result_title": "✨ Aquí está tu creación:",
-        "need_answers": "⚠️ Responde al menos a una pregunta.",
-        "writing": "⏳ Espere, su obra está en construcción...",
-        "tries_left": "Le quedan {n} intentos de 5."
-    },
-    "DE": {
-        "title": "🎨 Kreativwerkstatt — EDU",
-        "subtitle": "Erstelle leicht Geschichten, Gedichte, Lieder oder Sketche für Schüler (6–14). Beantworte die Fragen ➝ als PDF herunterladen ✨",
-        "choose_lang": "🌍 Wähle die Sprache und Aktivität",
-        "author": "✍️ Autor",
-        "author_name": "Name des Autors:",
-        "answer": "📝 Beantworte die Fragen",
-        "hint": "💡 Nutze die Vorschläge per Klick oder füge deine eigene Idee hinzu.",
-        "generate": "🪄 Text generieren",
-        "pdf_dl": "⬇️ Als PDF herunterladen",
-        "carousel_prompt": "Wähle ein Bild",
-        "tagline": "✨ Erstelle eine magische Geschichte mit deinen Schülern",
-        "result_title": "✨ Hier ist deine Erstellung:",
-        "need_answers": "⚠️ Bitte beantworte mindestens eine Frage.",
-        "writing": "⏳ Bitte warten, dein Werk wird erstellt...",
-        "tries_left": "Du hast noch {n} von 5 Versuchen."
-    },
-    "IT": {
-        "title": "🎨 Laboratorio Creativo — EDU",
-        "subtitle": "Crea facilmente storie, poesie, canzoni o scenette per studenti (6–14). Rispondi alle domande ➝ scarica in PDF ✨",
-        "choose_lang": "🌍 Scegli la lingua e l’attività",
-        "author": "✍️ Autore",
-        "author_name": "Nome dell’autore:",
-        "answer": "📝 Rispondi alle domande",
-        "hint": "💡 Usa i suggerimenti con un clic oppure aggiungi la tua idea.",
-        "generate": "🪄 Genera il testo",
-        "pdf_dl": "⬇️ Scarica in PDF",
-        "carousel_prompt": "Seleziona un’immagine",
-        "tagline": "✨ Crea una storia magica con i tuoi studenti",
-        "result_title": "✨ Ecco la tua creazione:",
-        "need_answers": "⚠️ Rispondi ad almeno una domanda.",
-        "writing": "⏳ Attendere, la tua opera è in costruzione...",
-        "tries_left": "Ti restano {n} tentativi su 5."
-    }
+    # Ajoute ES, DE, IT pareil...
 }
 
 # =========================
@@ -354,95 +138,70 @@ LABELS = {
 # =========================
 if "lang" not in st.session_state:
     st.session_state.lang = "FR"
-if "essais" not in st.session_state:
-    st.session_state["essais"] = 0
 lang = st.session_state.lang
 
 # =========================
-# TITRE
+# TITRE + IDENTIFICATION
 # =========================
-st.markdown(
-    f"<h1 style='text-align: center; color: #ff69b4;'>{LABELS[lang]['title']}</h1>",
-    unsafe_allow_html=True
-)
+st.markdown(f"<h1 style='text-align:center;color:#ff69b4'>{LABELS[lang]['title']}</h1>", unsafe_allow_html=True)
 st.caption(LABELS[lang]["subtitle"])
-st.info("💡 Votre clé OpenAI est sécurisée via Streamlit Cloud (Secrets).")
-# =========================
-# CARROUSEL / SLIDER D'INSPIRATION
-# =========================
-st.markdown("## 🎬 Inspirations")
+st.info(LABELS[lang]["secure_api"])
 
+st.markdown(f"### {LABELS[lang]['identify']}")
+user_id = st.text_input("", "")
+if not user_id:
+    st.warning("⚠️ Merci d’entrer votre nom/email pour continuer.")
+    st.stop()
+
+# Initialiser quota individuel
+if f"essais_{user_id}" not in st.session_state:
+    st.session_state[f"essais_{user_id}"] = 0
+
+# Fonction log
+def log_usage(user, lang, activity, essais):
+    with open("logs.csv", "a", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow([datetime.now().isoformat(), user, lang, activity, essais])
+
+# =========================
+# INSPIRATIONS (CARROUSEL)
+# =========================
+st.markdown("## " + LABELS[lang]["inspirations"])
 images = [
     {"file": "slide1.jpg", "caption": LABELS[lang]["tagline"]},
     {"file": "slide2.jpg", "caption": "🎭"},
     {"file": "slide4.jpg", "caption": "🎵"},
 ]
-
-# Index initial
-if "carousel_index" not in st.session_state:
-    st.session_state.carousel_index = 0
-
-# Slider
-slider_val = st.slider(
-    LABELS[lang]["carousel_prompt"],
-    min_value=1, max_value=len(images),
-    value=st.session_state.carousel_index + 1,
-    key="carousel_slider"
-)
-
-# Mettre à jour l’index
-st.session_state.carousel_index = slider_val - 1
-current = images[st.session_state.carousel_index]
-
-# Afficher l’image si dispo
-if os.path.exists(current["file"]):
-    st.image(current["file"], use_container_width=True, caption=current["caption"])
-else:
-    st.warning(f"Image introuvable : {current['file']}")
+slider_val = st.slider(LABELS[lang]["carousel_prompt"], 1, len(images), 1)
+current = images[slider_val - 1]
+st.image(current["file"], use_container_width=True, caption=current["caption"])
 
 # =========================
-# ACTIVITÉ + LANGUE
+# LANGUE + ACTIVITÉ
 # =========================
 st.markdown(f"### {LABELS[lang]['choose_lang']}")
-# =========================
-# LANGUE
-# =========================
-lang = st.radio(
-    LABELS[lang]['choose_lang'],
-    options=["FR", "EN", "ES", "DE", "IT"],
-    format_func=lambda x: {
-        "FR": "🇫🇷 Français",
-        "EN": "🇬🇧 English",
-        "ES": "🇪🇸 Español",
-        "DE": "🇩🇪 Deutsch",
-        "IT": "🇮🇹 Italiano"
-    }[x],
-    horizontal=True,
-    index=["FR", "EN", "ES", "DE", "IT"].index(st.session_state.get("lang", "FR"))
-)
-st.session_state.lang = lang
+lang_buttons = {"🇫🇷 FR": "FR", "🇬🇧 EN": "EN"}
+cols = st.columns(len(lang_buttons))
+for i, (label, code) in enumerate(lang_buttons.items()):
+    if cols[i].button(label):
+        st.session_state.lang = code
+        st.rerun()
+lang = st.session_state.lang
 
+activities = ["Histoire", "Saynette", "Poème", "Chanson", "Libre"]
+cols = st.columns(len(activities))
+for i, act in enumerate(activities):
+    if cols[i].button(act):
+        st.session_state.activity = act
+if "activity" not in st.session_state:
+    st.session_state.activity = "Histoire"
+activity = st.session_state.activity
 
 # =========================
-# ACTIVITÉ
+# CHAMP AUTEUR
 # =========================
-activity = st.radio(
-    "🎭 Activité",
-    options=["Histoire", "Saynette", "Poème", "Chanson", "Libre"],
-    format_func=lambda x: {
-        "Histoire": "📖 Histoire",
-        "Saynette": "🎭 Saynette",
-        "Poème": "✒️ Poème",
-        "Chanson": "🎵 Chanson",
-        "Libre": "✨ Libre"
-    }[x],
-    horizontal=True,
-    index=["Histoire", "Saynette", "Poème", "Chanson", "Libre"].index(
-        st.session_state.get("activity", "Histoire")
-    )
-)
-st.session_state.activity = activity
-
+st.markdown(f"### {LABELS[lang]['author']}")
+author = st.text_input(LABELS[lang]["author_name"], LABELS[lang]["default_author"])
 
 # =========================
 # CHAMP AUTEUR
@@ -610,63 +369,52 @@ placeholders = {
     "DE": "Deine Idee oder ein Vorschlag…",
     "IT": "La tua idea o un suggerimento…",
 }
-
 # =========================
-# AFFICHAGE QUESTIONS (corrigé, compact, lisible)
+# AFFICHAGE QUESTIONS
 # =========================
 st.markdown(f"### {LABELS[lang]['answer']}")
 st.caption(LABELS[lang]["hint"])
+
+placeholders = {
+    "FR": "Votre idée ou une suggestion…",
+    "EN": "Your idea or a suggestion…",
+    "ES": "Tu idea o una sugerencia…",
+    "DE": "Deine Idee oder ein Vorschlag…",
+    "IT": "La tua idea o un suggerimento…",
+}
 
 answers = []
 questions = QPACK.get(lang, QPACK["FR"]).get(activity, [])
 progress = st.progress(0)
 
 for i, q in enumerate(questions, start=1):
-    # Question
-    st.markdown(
-        f"<div class='question-card'><b>{i}. {q['q']}</b></div>",
-        unsafe_allow_html=True
-    )
-
-    # Clé unique
+    st.markdown(f"<div class='question-card'><b>{i}. {q['q']}</b></div>", unsafe_allow_html=True)
     key_text = f"answer_{activity}_{lang}_{i}"
-
-    # Suggestions en boutons côte à côte
     cols = st.columns(len(q["sug"]))
     for j, sug in enumerate(q["sug"]):
         if cols[j].button(sug, key=f"btn_{activity}_{lang}_{i}_{j}"):
             st.session_state[key_text] = sug
-
-    # Champ texte lié à la question (bien fermé !)
-    val = st.text_input(
-        " ",
-        key=key_text,
-        label_visibility="collapsed",
-        placeholder=placeholders.get(lang, "Votre idée ou une suggestion…")
-    )
+    val = st.text_input(" ", key=key_text, label_visibility="collapsed", placeholder=placeholders.get(lang, "Votre idée ou une suggestion…"))
     answers.append(val)
-
-    # Progression
     progress.progress(int(i / max(1, len(questions)) * 100))
 
-
-# Petit indicateur d’essais restants
-st.caption(LABELS[lang]["tries_left"].format(n=max(0, 5 - st.session_state["essais"])))
+# Afficher quota
+st.caption(LABELS[lang]["tries_left"].format(n=max(0, 5 - st.session_state[f"essais_{user_id}"])))
 
 # =========================
-# GENERATION (Quota 5 essais)
+# GENERATION TEXTE + PDF
 # =========================
 if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary"):
     if not any(answers):
         st.error(LABELS[lang]["need_answers"])
     else:
-        if st.session_state["essais"] >= 5:
+        if st.session_state[f"essais_{user_id}"] >= 5:
             st.warning("🚫 Vous avez atteint vos 5 essais gratuits.")
         else:
-            st.session_state["essais"] += 1
+            st.session_state[f"essais_{user_id}"] += 1
+            log_usage(user_id, lang, activity, st.session_state[f"essais_{user_id}"])
             with st.spinner(LABELS[lang]["writing"]):
                 try:
-                    # Construire le prompt
                     prompt = f"Langue : {lang}. Activité : {activity}. Auteur : {author}\n"
                     prompt += "Crée un texte adapté aux enfants (6–14 ans), positif, créatif et bienveillant.\n"
                     if activity == "Poème":
@@ -682,7 +430,7 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
                         if a:
                             prompt += f"Q{k}: {a}\n"
 
-                    # Appel OpenAI
+                    # OpenAI
                     resp = client.chat.completions.create(
                         model="gpt-4o-mini",
                         messages=[
@@ -694,28 +442,21 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
                     )
                     story = resp.choices[0].message.content.strip()
 
-                    # Affichage résultat (⚠️ bien indenté)
+                    # Résultat
                     st.success(LABELS[lang]["result_title"])
-                    st.markdown(
-                        f"<div class='result-box'>{story}</div>",
-                        unsafe_allow_html=True
-                    )
+                    st.markdown(f"<div class='result-box'>{story}</div>", unsafe_allow_html=True)
 
                     # Export PDF
                     def create_pdf(text: str) -> str:
                         tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
                         c = canvas.Canvas(tmp_file.name, pagesize=A4)
                         width, height = A4
-
-                        # Page de garde
                         c.setFont("Helvetica-Bold", 22)
                         c.drawCentredString(width/2, height - 4*cm, "Atelier Créatif — EDU")
                         c.setFont("Helvetica", 16)
                         c.drawCentredString(width/2, height - 5*cm, activity)
                         c.setFont("Helvetica-Oblique", 10)
                         c.drawCentredString(width/2, height - 6*cm, datetime.now().strftime("%d/%m/%Y"))
-
-                        # Corps
                         c.showPage()
                         c.setFont("Helvetica", 12)
                         y = height - 3*cm
@@ -740,8 +481,5 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
                             mime="application/pdf",
                             use_container_width=True
                         )
-
                 except Exception as e:
                     st.error(f"❌ Erreur OpenAI : {e}")
-
-
