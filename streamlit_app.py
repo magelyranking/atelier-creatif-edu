@@ -256,10 +256,28 @@ if f"essais_{user_id}" not in st.session_state:
     st.session_state[f"essais_{user_id}"] = 0
 
 # Fonction log
-def log_usage(user, lang, activity, essais):
-    with open("logs.csv", "a", newline="", encoding="utf-8") as f:
+ddef log_usage(user_id: str, lang: str, activity: str, essais: int):
+    """Log l'utilisation dans logs.csv (crée le fichier si besoin)."""
+    log_file = Path("logs.csv")
+    file_exists = log_file.exists()
+
+    # Colonnes toujours les mêmes
+    headers = ["timestamp", "user_id", "lang", "activity", "essais"]
+
+    with open(log_file, mode="a", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow([datetime.now().isoformat(), user, lang, activity, essais])
+        # écrire l'entête si le fichier est nouveau
+        if not file_exists:
+            writer.writerow(headers)
+        # écrire la ligne
+        writer.writerow([
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            user_id if user_id else "inconnu",
+            lang,
+            activity,
+            essais
+        ])
+
 
 # =========================
 # INSPIRATIONS (CARROUSEL)
@@ -634,6 +652,7 @@ if admin_code == os.environ.get("ADMIN_CODE", "1234"):
         essais_user = essais_user.rename(columns={"essais": "Nb essais"})
         st.sidebar.markdown("👤 Par utilisateur")
         st.sidebar.dataframe(essais_user, use_container_width=True, height=200)
+        log_usage(user_id, lang, activity, st.session_state["essais"])
 
         # Essais par langue
         essais_lang = df["lang"].value_counts().reset_index()
