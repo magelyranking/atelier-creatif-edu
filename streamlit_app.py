@@ -130,7 +130,7 @@ LABELS = {
         "default_author": "My class",
         "identify": "👤 Identification (Name or Email)"
     },
-    # Ajoute ES, DE, IT pareil...
+    # ES, DE, IT à compléter…
 }
 
 # =========================
@@ -148,7 +148,7 @@ st.caption(LABELS[lang]["subtitle"])
 st.info(LABELS[lang]["secure_api"])
 
 st.markdown(f"### {LABELS[lang]['identify']}")
-user_id = st.text_input("", "")
+user_id = st.text_input("", "", key="user_id_input")
 if not user_id:
     st.warning("⚠️ Merci d’entrer votre nom/email pour continuer.")
     st.stop()
@@ -201,13 +201,7 @@ activity = st.session_state.activity
 # CHAMP AUTEUR
 # =========================
 st.markdown(f"### {LABELS[lang]['author']}")
-author = st.text_input(LABELS[lang]["author_name"], LABELS[lang]["default_author"])
-
-# =========================
-# CHAMP AUTEUR
-# =========================
-st.markdown(f"### {LABELS[lang]['author']}")
-author = st.text_input(LABELS[lang]["author_name"], "Ma classe")
+author = st.text_input(LABELS[lang]["author_name"], LABELS[lang]["default_author"], key="author_input")
 
 # =========================
 # QPACK COMPLET (questions + suggestions)
