@@ -648,20 +648,24 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
                             "- Longueur : 2 à 6 strophes.\n"
                             "- Ton adapté aux enfants.\n\n"
                         )
-                    elif activity == "Chanson":
-                        prompt += (
-                            "Consignes pour la chanson :\n"
-                            "- Respecter le style musical (pop, jazz, rap, folk...)\n"
-                            "- Structure : plusieurs couplets courts + un refrain répété.\n"
-                            "- Ambiance adaptée aux enfants.\n\n"
-                        )
-                    elif activity == "Saynette":
-                        prompt += (
-                            "Consignes pour la saynette :\n"
-                            "- Respecter le style théâtral choisi (comédie, vaudeville, drame, comédie musicale...)\n"
-                            "- Dialogue entre 2 à 4 personnages.\n"
-                            "- De 6 à 18 répliques.\n\n"
-                        )
+                   elif activity == "Chanson":
+    prompt += (
+        "Consignes pour la chanson :\n"
+        "- Respecter le style musical choisi (pop, jazz, rap, folk...)\n"
+        "- Structure : plusieurs couplets courts + un refrain répété.\n"
+        "- Ambiance adaptée aux enfants.\n"
+        "- Fournir aussi une suggestion musicale simple (ex : accords C-G-Am-F, rythme 4/4, tempo modéré).\n\n"
+    )
+
+elif activity == "Saynette":
+    prompt += (
+        "Consignes pour la saynette :\n"
+        "- Respecter le style théâtral choisi (comédie, vaudeville, drame, comédie musicale...)\n"
+        "- Dialogue entre 2 à 4 personnages.\n"
+        "- De 6 à 12 répliques.\n"
+        "- Si c’est une comédie musicale, ajouter aussi une indication de rythme ou de style musical (ex : jazz, pop, folk, tempo rapide ou lent).\n\n"
+    )
+
                     elif activity == "Histoire":
                         prompt += (
                             "Consignes pour l’histoire :\n"
