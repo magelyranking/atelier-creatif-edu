@@ -632,60 +632,57 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
         else:
             st.session_state[f"essais_{user_id}"] += 1
             log_usage(user_id, lang, activity, st.session_state[f"essais_{user_id}"])
+            
             with st.spinner(LABELS[lang]["writing"]):
                 try:
                     # Construire le prompt enrichi
-with st.spinner(LABELS[lang]["writing"]):
-    try:
-        # Construire le prompt enrichi
-        prompt = f"Langue : {lang}. Activité : {activity}. Auteur : {author}\n"
-        prompt += "Tu dois créer un texte adapté aux enfants (6–14 ans). "
-        prompt += "Le texte doit être positif, créatif, structuré et bienveillant.\n\n"
+                    prompt = f"Langue : {lang}. Activité : {activity}. Auteur : {author}\n"
+                    prompt += "Tu dois créer un texte adapté aux enfants (6–14 ans). "
+                    prompt += "Le texte doit être positif, créatif, structuré et bienveillant.\n\n"
 
-        # Consignes spécifiques par activité
-        if activity == "Poème":
-            prompt += (
-                "Consignes pour le poème :\n"
-                "- Respecter le style choisi (alexandrin, haïku, rimes libres, etc.)\n"
-                "- Longueur : 2 à 4 strophes.\n"
-                "- Ton adapté aux enfants.\n\n"
-            )
-        elif activity == "Chanson":
-            prompt += (
-                "Consignes pour la chanson :\n"
-                "- Respecter le style musical (pop, jazz, rap, folk...)\n"
-                "- Structure : plusieurs couplets courts + un refrain répété.\n"
-                "- Ambiance adaptée aux enfants.\n\n"
-            )
-        elif activity == "Saynette":
-            prompt += (
-                "Consignes pour la saynette :\n"
-                "- Respecter le style théâtral choisi (comédie, vaudeville, drame, comédie musicale...)\n"
-                "- Dialogue entre 2 à 4 personnages.\n"
-                "- De 6 à 12 répliques.\n\n"
-            )
-        elif activity == "Histoire":
-            prompt += (
-                "Consignes pour l’histoire :\n"
-                "- Structure claire : début, problème, solution, fin.\n"
-                "- Ton choisi par l’utilisateur (drôle, mystérieux, épique...)\n"
-                "- Fin souhaitée (heureuse, morale, surprenante...)\n\n"
-            )
-        elif activity == "Libre":
-            prompt += (
-                "Consignes pour le texte libre :\n"
-                "- Respecter le type choisi (lettre, dialogue, journal...)\n"
-                "- Ton narratif choisi (réaliste, imaginaire, poétique...)\n\n"
-            )
+                    # Consignes spécifiques par activité
+                    if activity == "Poème":
+                        prompt += (
+                            "Consignes pour le poème :\n"
+                            "- Respecter le style choisi (alexandrin, haïku, rimes libres, etc.)\n"
+                            "- Longueur : 2 à 6 strophes.\n"
+                            "- Ton adapté aux enfants.\n\n"
+                        )
+                    elif activity == "Chanson":
+                        prompt += (
+                            "Consignes pour la chanson :\n"
+                            "- Respecter le style musical (pop, jazz, rap, folk...)\n"
+                            "- Structure : plusieurs couplets courts + un refrain répété.\n"
+                            "- Ambiance adaptée aux enfants.\n\n"
+                        )
+                    elif activity == "Saynette":
+                        prompt += (
+                            "Consignes pour la saynette :\n"
+                            "- Respecter le style théâtral choisi (comédie, vaudeville, drame, comédie musicale...)\n"
+                            "- Dialogue entre 2 à 4 personnages.\n"
+                            "- De 6 à 18 répliques.\n\n"
+                        )
+                    elif activity == "Histoire":
+                        prompt += (
+                            "Consignes pour l’histoire :\n"
+                            "- Structure claire : début, problème, solution, fin.\n"
+                            "- Ton choisi par l’utilisateur (drôle, mystérieux, épique...)\n"
+                            "- Fin souhaitée (heureuse, morale, surprenante...)\n\n"
+                        )
+                    elif activity == "Libre":
+                        prompt += (
+                            "Consignes pour le texte libre :\n"
+                            "- Respecter le type choisi (lettre, dialogue, journal...)\n"
+                            "- Ton narratif choisi (réaliste, imaginaire, poétique...)\n\n"
+                        )
 
-        # Intégrer toutes les réponses utilisateur
-        prompt += "Voici les réponses données par l’utilisateur :\n"
-        for k, a in enumerate(answers, 1):
-            if a:
-                prompt += f"- Q{k}: {a}\n"
+                    # Intégrer toutes les réponses utilisateur
+                    prompt += "Voici les réponses données par l’utilisateur :\n"
+                    for k, a in enumerate(answers, 1):
+                        if a:
+                            prompt += f"- Q{k}: {a}\n"
 
-        prompt += "\nMaintenant, rédige le texte en suivant ces éléments."
-
+                    prompt += "\nMaintenant, rédige le texte en suivant ces éléments."
 
                     # OpenAI
                     resp = client.chat.completions.create(
@@ -738,13 +735,17 @@ with st.spinner(LABELS[lang]["writing"]):
                             mime="application/pdf",
                             use_container_width=True
                         )
+
                 except Exception as e:
                     st.error(f"❌ Erreur OpenAI : {e}")
-from pathlib import Path
+
 
 # =========================
 # SECTION ADMIN (Accès protégé)
 # =========================
+from pathlib import Path
+import pandas as pd
+
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 🔒 Accès administrateur")
 
@@ -753,7 +754,7 @@ admin_code = st.sidebar.text_input("Code admin :", type="password")
 if admin_code == os.environ.get("ADMIN_CODE", "1234"):
     st.sidebar.success("✅ Accès admin activé")
 
-    log_file = Path("logs.csv")   # ✅ Défini avant de l’utiliser
+    log_file = Path("logs.csv")
 
     if log_file.exists():
         # Téléchargement CSV
@@ -767,7 +768,6 @@ if admin_code == os.environ.get("ADMIN_CODE", "1234"):
             )
 
         # Lecture du fichier log
-        import pandas as pd
         df = pd.read_csv(log_file)
 
         st.sidebar.markdown("### 📊 Statistiques")
@@ -797,7 +797,6 @@ if admin_code == os.environ.get("ADMIN_CODE", "1234"):
 
     else:
         st.sidebar.info("📂 Aucun log enregistré pour l’instant.")
-
 else:
     if admin_code:
         st.sidebar.error("❌ Code incorrect")
