@@ -611,24 +611,23 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
                         )
                 except Exception as e:
                     st.error(f"❌ Erreur OpenAI : {e}")
+from pathlib import Path
+
 # =========================
 # SECTION ADMIN (Accès protégé)
 # =========================
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 🔒 Accès administrateur")
 
-# Champ mot de passe admin
 admin_code = st.sidebar.text_input("Code admin :", type="password")
 
-# Vérification : ADMIN_CODE depuis secrets ou fallback
 if admin_code == os.environ.get("ADMIN_CODE", "1234"):
     st.sidebar.success("✅ Accès admin activé")
 
-    from pathlib import Path
-    log_file = Path("logs.csv")
+    log_file = Path("logs.csv")   # ✅ Défini avant de l’utiliser
 
     if log_file.exists():
-        # Téléchargement du CSV
+        # Téléchargement CSV
         with open(log_file, "rb") as f:
             st.sidebar.download_button(
                 label="⬇️ Télécharger les logs (CSV)",
@@ -638,32 +637,38 @@ if admin_code == os.environ.get("ADMIN_CODE", "1234"):
                 use_container_width=True
             )
 
-        # Lecture des logs
-    # Lecture des logs
-df = pd.read_csv(log_file)
+        # Lecture du fichier log
+        import pandas as pd
+        df = pd.read_csv(log_file)
 
-st.sidebar.markdown("### 📊 Statistiques")
+        st.sidebar.markdown("### 📊 Statistiques")
 
-# Nombre total d’essais
-total_essais = len(df)
-st.sidebar.metric("Nombre total d’essais", total_essais)
+        # Nombre total d’essais
+        total_essais = len(df)
+        st.sidebar.metric("Nombre total d’essais", total_essais)
 
-# Vérifier les colonnes avant d'afficher
-if "user_id" in df.columns and "essais" in df.columns:
-    essais_user = df.groupby("user_id")["essais"].max().reset_index()
-    essais_user = essais_user.rename(columns={"essais": "Nb essais"})
-    st.sidebar.markdown("👤 Par utilisateur")
-    st.sidebar.dataframe(essais_user, use_container_width=True, height=200)
+        # Vérifier colonnes avant affichage
+        if "user_id" in df.columns and "essais" in df.columns:
+            essais_user = df.groupby("user_id")["essais"].max().reset_index()
+            essais_user = essais_user.rename(columns={"essais": "Nb essais"})
+            st.sidebar.markdown("👤 Par utilisateur")
+            st.sidebar.dataframe(essais_user, use_container_width=True, height=200)
 
-if "lang" in df.columns:
-    essais_lang = df["lang"].value_counts().reset_index()
-    essais_lang.columns = ["Langue", "Nb essais"]
-    st.sidebar.markdown("🌍 Par langue")
-    st.sidebar.dataframe(essais_lang, use_container_width=True, height=200)
+        if "lang" in df.columns:
+            essais_lang = df["lang"].value_counts().reset_index()
+            essais_lang.columns = ["Langue", "Nb essais"]
+            st.sidebar.markdown("🌍 Par langue")
+            st.sidebar.dataframe(essais_lang, use_container_width=True, height=200)
 
-if "activity" in df.columns:
-    essais_act = df["activity"].value_counts().reset_index()
-    essais_act.columns = ["Activité", "Nb essais"]
-    st.sidebar.markdown("🎭 Par activité")
-    st.sidebar.dataframe(essais_act, use_container_width=True, height=200)
+        if "activity" in df.columns:
+            essais_act = df["activity"].value_counts().reset_index()
+            essais_act.columns = ["Activité", "Nb essais"]
+            st.sidebar.markdown("🎭 Par activité")
+            st.sidebar.dataframe(essais_act, use_container_width=True, height=200)
 
+    else:
+        st.sidebar.info("📂 Aucun log enregistré pour l’instant.")
+
+else:
+    if admin_code:
+        st.sidebar.error("❌ Code incorrect")
