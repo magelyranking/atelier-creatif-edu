@@ -620,32 +620,32 @@ if admin_code == os.environ.get("ADMIN_CODE", "1234"):
                 use_container_width=True
             )
 
-        # Lecture et affichage stats
+        # Lecture des logs
         df = pd.read_csv(log_file)
 
-        st.markdown("## 📊 Statistiques d’utilisation")
+        st.sidebar.markdown("### 📊 Statistiques")
 
         # Nombre total d’essais
         total_essais = len(df)
-        st.metric("Nombre total d’essais", total_essais)
+        st.sidebar.metric("Nombre total d’essais", total_essais)
 
         # Essais par utilisateur
         essais_user = df.groupby("user_id")["essais"].max().reset_index()
         essais_user = essais_user.rename(columns={"essais": "Nb essais"})
-        st.markdown("### 👤 Essais par utilisateur")
-        st.dataframe(essais_user, use_container_width=True)
+        st.sidebar.markdown("👤 Par utilisateur")
+        st.sidebar.dataframe(essais_user, use_container_width=True, height=200)
 
         # Essais par langue
         essais_lang = df["lang"].value_counts().reset_index()
         essais_lang.columns = ["Langue", "Nb essais"]
-        st.markdown("### 🌍 Essais par langue")
-        st.dataframe(essais_lang, use_container_width=True)
+        st.sidebar.markdown("🌍 Par langue")
+        st.sidebar.dataframe(essais_lang, use_container_width=True, height=200)
 
         # Essais par activité
         essais_act = df["activity"].value_counts().reset_index()
         essais_act.columns = ["Activité", "Nb essais"]
-        st.markdown("### 🎭 Essais par activité")
-        st.dataframe(essais_act, use_container_width=True)
+        st.sidebar.markdown("🎭 Par activité")
+        st.sidebar.dataframe(essais_act, use_container_width=True, height=200)
 
     else:
         st.sidebar.info("📂 Aucun log enregistré pour l’instant.")
