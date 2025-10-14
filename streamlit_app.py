@@ -635,55 +635,56 @@ if st.button(LABELS[lang]["generate"], use_container_width=True, type="primary")
             with st.spinner(LABELS[lang]["writing"]):
                 try:
                     # Construire le prompt enrichi
-try:
-    # Construire le prompt enrichi
-    prompt = f"Langue : {lang}. Activité : {activity}. Auteur : {author}\n"
-    prompt += "Tu dois créer un texte adapté aux enfants (6–14 ans). "
-    prompt += "Le texte doit être positif, créatif, structuré et bienveillant.\n\n"
+with st.spinner(LABELS[lang]["writing"]):
+    try:
+        # Construire le prompt enrichi
+        prompt = f"Langue : {lang}. Activité : {activity}. Auteur : {author}\n"
+        prompt += "Tu dois créer un texte adapté aux enfants (6–14 ans). "
+        prompt += "Le texte doit être positif, créatif, structuré et bienveillant.\n\n"
 
-    # Consignes spécifiques par activité
-    if activity == "Poème":
-        prompt += (
-            "Consignes pour le poème :\n"
-            "- Respecter le style choisi (alexandrin, haïku, rimes libres, etc.)\n"
-            "- Longueur : 2 à 4 strophes.\n"
-            "- Ton adapté aux enfants.\n\n"
-        )
-    elif activity == "Chanson":
-        prompt += (
-            "Consignes pour la chanson :\n"
-            "- Respecter le style musical (pop, jazz, rap, folk...)\n"
-            "- Structure : plusieurs couplets courts + un refrain répété.\n"
-            "- Ambiance adaptée aux enfants.\n\n"
-        )
-    elif activity == "Saynette":
-        prompt += (
-            "Consignes pour la saynette :\n"
-            "- Respecter le style théâtral choisi (comédie, vaudeville, drame, comédie musicale...)\n"
-            "- Dialogue entre 2 à 4 personnages.\n"
-            "- De 6 à 12 répliques.\n\n"
-        )
-    elif activity == "Histoire":
-        prompt += (
-            "Consignes pour l’histoire :\n"
-            "- Structure claire : début, problème, solution, fin.\n"
-            "- Ton choisi par l’utilisateur (drôle, mystérieux, épique...)\n"
-            "- Fin souhaitée (heureuse, morale, surprenante...)\n\n"
-        )
-    elif activity == "Libre":
-        prompt += (
-            "Consignes pour le texte libre :\n"
-            "- Respecter le type choisi (lettre, dialogue, journal...)\n"
-            "- Ton narratif choisi (réaliste, imaginaire, poétique...)\n\n"
-        )
+        # Consignes spécifiques par activité
+        if activity == "Poème":
+            prompt += (
+                "Consignes pour le poème :\n"
+                "- Respecter le style choisi (alexandrin, haïku, rimes libres, etc.)\n"
+                "- Longueur : 2 à 4 strophes.\n"
+                "- Ton adapté aux enfants.\n\n"
+            )
+        elif activity == "Chanson":
+            prompt += (
+                "Consignes pour la chanson :\n"
+                "- Respecter le style musical (pop, jazz, rap, folk...)\n"
+                "- Structure : plusieurs couplets courts + un refrain répété.\n"
+                "- Ambiance adaptée aux enfants.\n\n"
+            )
+        elif activity == "Saynette":
+            prompt += (
+                "Consignes pour la saynette :\n"
+                "- Respecter le style théâtral choisi (comédie, vaudeville, drame, comédie musicale...)\n"
+                "- Dialogue entre 2 à 4 personnages.\n"
+                "- De 6 à 12 répliques.\n\n"
+            )
+        elif activity == "Histoire":
+            prompt += (
+                "Consignes pour l’histoire :\n"
+                "- Structure claire : début, problème, solution, fin.\n"
+                "- Ton choisi par l’utilisateur (drôle, mystérieux, épique...)\n"
+                "- Fin souhaitée (heureuse, morale, surprenante...)\n\n"
+            )
+        elif activity == "Libre":
+            prompt += (
+                "Consignes pour le texte libre :\n"
+                "- Respecter le type choisi (lettre, dialogue, journal...)\n"
+                "- Ton narratif choisi (réaliste, imaginaire, poétique...)\n\n"
+            )
 
-    # Intégrer toutes les réponses utilisateur
-    prompt += "Voici les réponses données par l’utilisateur :\n"
-    for k, a in enumerate(answers, 1):
-        if a:
-            prompt += f"- Q{k}: {a}\n"
+        # Intégrer toutes les réponses utilisateur
+        prompt += "Voici les réponses données par l’utilisateur :\n"
+        for k, a in enumerate(answers, 1):
+            if a:
+                prompt += f"- Q{k}: {a}\n"
 
-    prompt += "\nMaintenant, rédige le texte en suivant ces éléments."
+        prompt += "\nMaintenant, rédige le texte en suivant ces éléments."
 
 
                     # OpenAI
